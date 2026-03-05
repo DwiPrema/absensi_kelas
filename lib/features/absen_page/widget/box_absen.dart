@@ -1,3 +1,4 @@
+import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:absensi_kelas/core/constant/app_colors.dart';
@@ -30,10 +31,10 @@ class _BoxAbsenState extends State<BoxAbsen> {
   late String _currentStatus; // menyimpan status secara lokal
 
   final List<Map<String, dynamic>> _statusOptions = [
-    {'label': 'Hadir', 'color': AppColors.greenhadir},
-    {'label': 'Sakit', 'color': AppColors.yellowsakit},
-    {'label': 'Izin', 'color': AppColors.blueizin},
-    {'label': 'Alpha', 'color': AppColors.redalpha},
+    {'label': 'Hadir', 'color': AppColors.greenHadir},
+    {'label': 'Sakit', 'color': AppColors.yellow},
+    {'label': 'Izin', 'color': AppColors.blueIzin},
+    {'label': 'Alpha', 'color': AppColors.redAlpha},
   ];
 
   @override
@@ -59,12 +60,11 @@ class _BoxAbsenState extends State<BoxAbsen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-            'Pilih Status Absen',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+          title: textPoppins(
+            "Pilih Status Absen",
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.black
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -80,12 +80,11 @@ class _BoxAbsenState extends State<BoxAbsen> {
                       color: option['color'],
                     ),
                   ),
-                  title: Text(
-                    option['label'],
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  title: textPoppins(
+                    option["label"],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.black
                   ),
                   onTap: () {
                     Navigator.pop(context); // Tutup dialog
@@ -103,9 +102,9 @@ class _BoxAbsenState extends State<BoxAbsen> {
               onPressed: () {
                 Navigator.pop(context); // Tutup dialog
               },
-              child: Text(
-                'Batal',
-                style: GoogleFonts.poppins(color: Colors.grey[600]),
+              child: textPoppins(
+                "Batal",
+                color: AppColors.black.withAlpha(190),
               ),
             ),
           ],
@@ -118,13 +117,13 @@ class _BoxAbsenState extends State<BoxAbsen> {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Hadir':
-        return AppColors.greenhadir;
+        return AppColors.greenHadir;
       case 'Sakit':
-        return AppColors.yellowsakit;
+        return AppColors.yellow;
       case 'Izin':
-        return AppColors.blueizin;
+        return AppColors.blueIzin;
       case 'Alpha':
-        return AppColors.redalpha;
+        return AppColors.redAlpha;
       default:
         return Colors.grey; // Warna default jika status tidak dikenali
     }
@@ -196,13 +195,10 @@ class _BoxAbsenState extends State<BoxAbsen> {
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Center(
-                  child: Text(
+                  child: textPoppins(
                     widget.no,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -221,13 +217,11 @@ class _BoxAbsenState extends State<BoxAbsen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(
-                    child: Text(
+                    child: textInriaSans(
                       _currentStatus,
-                      style: GoogleFonts.inriaSans(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),

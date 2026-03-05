@@ -1,7 +1,7 @@
+import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:absensi_kelas/core/constant/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'box_absen.dart';
+import 'widget/box_absen.dart';
 
 // 1. Kelas Utama: StatelessWidget (immutable)
 class AbsenPage extends StatefulWidget {
@@ -13,9 +13,11 @@ class AbsenPage extends StatefulWidget {
 
 // 2. Kelas State: Tempat menampung data & logika (mutable)
 class _AbsenPageState extends State<AbsenPage> {
+
   // Tempat menampung variabel status/state
   late DateTime now;
   String? selectedId; //♦️
+
   @override
   void initState() {
     super.initState();
@@ -65,7 +67,7 @@ class _AbsenPageState extends State<AbsenPage> {
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(
-                bottom: 400,
+                bottom: 100,
               ), // Memberi ruang untuk tombol
 
               child: Column(
@@ -79,7 +81,7 @@ class _AbsenPageState extends State<AbsenPage> {
                         height: 150,
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [AppColors.bluemc, AppColors.gradienbluemc],
+                            colors: [AppColors.bgBlue, AppColors.gradientBgBlue],
                             begin: FractionalOffset(
                               0.4,
                               0.1,
@@ -96,14 +98,7 @@ class _AbsenPageState extends State<AbsenPage> {
                         ),
 
                         child: Center(
-                          child: Text(
-                            'Kelas 11 RPL',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
+                          child: textPoppins("Kelas 11 RPL", fontSize: 18, fontWeight: FontWeight.w400, color: AppColors.white),
                         ),
                       ),
 
@@ -115,29 +110,15 @@ class _AbsenPageState extends State<AbsenPage> {
                             height: 80,
                             margin: const EdgeInsets.only(top: 110),
                             decoration: BoxDecoration(
-                              color: AppColors.yellowtgl,
+                              color: AppColors.yellow,
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    'Jumlah',
-                                    style: GoogleFonts.inriaSans(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '17',
-                                    style: GoogleFonts.inriaSans(
-                                      color: Colors.white,
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  textInriaSans("Jumlah", fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.white),
+                                  textInriaSans("17", color: AppColors.white, fontSize: 32, fontWeight: FontWeight.w700),
                                 ],
                               ),
                             ),
@@ -150,29 +131,15 @@ class _AbsenPageState extends State<AbsenPage> {
                             height: 80,
                             margin: const EdgeInsets.only(top: 110),
                             decoration: BoxDecoration(
-                              color: AppColors.yellowtgl,
+                              color: AppColors.yellow,
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  day,
-                                  style: GoogleFonts.inriaSans(
-                                    color: Colors.white,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                textInriaSans(day, fontSize: 32, fontWeight: FontWeight.w700,color: AppColors.white),
                                 const SizedBox(width: 10),
-                                Text(
-                                  '${_getMonthName(now.month)}\n${now.year}',
-                                  style: GoogleFonts.inriaSans(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                textInriaSans('${_getMonthName(now.month)}\n${now.year}', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.white),
                               ],
                             ),
                           ),
@@ -393,7 +360,7 @@ class _AbsenPageState extends State<AbsenPage> {
           ),
 
           Positioned(
-            bottom: 25,
+            bottom: 24,
             left: 0,
             right: 0,
             child: Center(
@@ -401,18 +368,15 @@ class _AbsenPageState extends State<AbsenPage> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 80,
-                    vertical: 15,
+                    vertical: 20,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  backgroundColor: AppColors.bluemc,
+                  backgroundColor: AppColors.button,
                 ),
                 onPressed: () {},
-                child: const Text(
-                  "Kirim",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                child: textPoppins("Kirim", fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.background)
               ),
             ),
           ),

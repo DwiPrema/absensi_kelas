@@ -1,9 +1,11 @@
+import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/features/absen_page/absen_page.dart';
+import 'package:absensi_kelas/features/home_page/widgets/calendar/calender.dart';
+import 'package:absensi_kelas/features/home_page/widgets/card/card_kelas.dart';
+import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import '../../core/constant/app_colors.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -108,14 +110,8 @@ class _HomePageState extends State<HomePage> {
                 child: Center(
                   child: Container(
                     margin: const EdgeInsets.only(top: 20),
-                    child: Text(
-                      '${_getMonthName(today)} ',
-                      style: GoogleFonts.pragatiNarrow(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    child: 
+                    textPagratiNarrow('${_getMonthName(today)} ', fontSize: 30, fontWeight: FontWeight.w700, color: AppColors.black),
                   ),
                 ),
               ),
@@ -173,16 +169,9 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               const SizedBox(height: 40),
-              const Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Text(
-                  'Pilih Kelas',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: textPoppins("Pilih Kelas", color: AppColors.black, fontSize: 25, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 20),
               // Di bagian CardKelas
@@ -195,9 +184,7 @@ class _HomePageState extends State<HomePage> {
                 absen: (kelas) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const AbsenPage()
-                    ),
+                    MaterialPageRoute(builder: (context) => const AbsenPage()),
                   );
                 },
               ),
@@ -212,9 +199,7 @@ class _HomePageState extends State<HomePage> {
                 absen: (kelas) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const AbsenPage()
-                    ),
+                    MaterialPageRoute(builder: (context) => const AbsenPage()),
                   );
                 },
               ),
@@ -228,9 +213,7 @@ class _HomePageState extends State<HomePage> {
                 absen: (kelas) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const AbsenPage()
-                    ),
+                    MaterialPageRoute(builder: (context) => const AbsenPage()),
                   );
                 },
               ),
@@ -238,13 +221,8 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () => _showExitDialog(context),
-                  label: Text(
-                    'Keluar ',
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  label: 
+                  textPoppins("Keluar", fontSize: 20, fontWeight: FontWeight.w700),
                   style: ElevatedButton.styleFrom(
                     fixedSize: const Size(400, 60),
                     backgroundColor: AppColors.button,

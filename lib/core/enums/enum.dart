@@ -1,0 +1,1 @@
+enum DayType { past, today, future }

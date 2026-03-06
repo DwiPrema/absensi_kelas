@@ -151,7 +151,7 @@ class _AbsenPageState extends State<AbsenPage> {
 
                   BoxAbsen(
                     id: '1',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'Dewa Nyoman Satrya Wiguna',
                     no: '1',
                     status: 'Hadir',
@@ -164,7 +164,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '2',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'FELLISHA MAY CRISTIANI DANISIYA PUTRI',
                     no: '2',
                     status: 'Hadir',
@@ -176,7 +176,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '3',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'I Gede Ary Wiguna',
                     no: '3',
                     status: 'Hadir',
@@ -188,7 +188,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '4',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'I Kadek Adiputra Suastika',
                     no: '4',
                     status: 'Hadir',
@@ -200,7 +200,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '5',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'I Kadek Dwi Adi Primananda',
                     no: '5',
                     status: 'Hadir',
@@ -212,7 +212,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '6',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'I KADEK SANDI DWIPAYANA PUTRA',
                     no: '6',
                     status: 'Hadir',
@@ -224,7 +224,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '7',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'I Made Dwi Premayasa',
                     no: '7',
                     status: 'Hadir',
@@ -236,7 +236,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '8',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'I Made Dwik Prawira',
                     no: '8',
                     status: 'Hadir',
@@ -248,7 +248,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '9',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'I Putu Anantha Saputra',
                     no: '9',
                     status: 'Hadir',
@@ -260,7 +260,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '10',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'Kadek Isaka Lingga Yoni',
                     no: '10',
                     status: 'Hadir',
@@ -272,7 +272,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '11',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'Kadek Kirana Purwita Kumala',
                     no: '11',
                     status: 'Hadir',
@@ -284,7 +284,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '12',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'Kadek Setia Dharma',
                     no: '12',
                     status: 'Hadir',
@@ -296,7 +296,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '13',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'Kaindra Naufal Nurwahid',
                     no: '13',
                     status: 'Hadir',
@@ -308,7 +308,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '14',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'KEYSA I\'IME SOFI BAHRAINI',
                     no: '14',
                     status: 'Hadir',
@@ -320,7 +320,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '15',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'Muhammad Nurul Najmi Mertayasa',
                     no: '15',
                     status: 'Hadir',
@@ -332,7 +332,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '16',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'NI MADE INDIRIANI',
                     no: '16',
                     status: 'Hadir',
@@ -344,7 +344,7 @@ class _AbsenPageState extends State<AbsenPage> {
                   ),
                   BoxAbsen(
                     id: '17',
-                    profile: '../asset/image/profile.jpg',
+                    profile: 'asset/image/profile.jpg',
                     nama: 'NI PUTU OKTAVIANI',
                     no: '17',
                     status: 'Hadir',

@@ -48,7 +48,7 @@ class CalendarCard extends StatelessWidget {
               children: [
                 textPoppins(date.day.toString(), fontSize: dateFontSize, fontWeight: FontWeight.w700, color: CalenderStyle.getTextColor(dayType)),
                 const SizedBox(height: 4),
-                textPoppins(getDayName(date), fontSize: dayNameFontSize, fontWeight: FontWeight.w500, color: CalenderStyle.getTextColor(dayType).withValues(alpha: 0.8)),
+                textPoppins(getDayName(date), fontSize: dayNameFontSize, fontWeight: FontWeight.w500, color: CalenderStyle.getTextColor(dayType).withAlpha(170)),
               ],
             ),
           ),

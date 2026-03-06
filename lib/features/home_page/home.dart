@@ -110,8 +110,10 @@ class _HomePageState extends State<HomePage> {
                 child: Center(
                   child: Container(
                     margin: const EdgeInsets.only(top: 20),
-                    child: 
-                    textPagratiNarrow('${_getMonthName(today)} ', fontSize: 30, fontWeight: FontWeight.w700, color: AppColors.black),
+                    child: textPagratiNarrow('${_getMonthName(today)} ',
+                        fontSize: 30,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.black),
                   ),
                 ),
               ),
@@ -171,7 +173,10 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 40),
               Padding(
                 padding: const EdgeInsets.only(left: 20),
-                child: textPoppins("Pilih Kelas", color: AppColors.black, fontSize: 25, fontWeight: FontWeight.w700),
+                child: textPoppins("Pilih Kelas",
+                    color: AppColors.black,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 20),
               // Di bagian CardKelas
@@ -219,10 +224,8 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 20),
               Center(
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   onPressed: () => _showExitDialog(context),
-                  label: 
-                  textPoppins("Keluar", fontSize: 20, fontWeight: FontWeight.w700),
                   style: ElevatedButton.styleFrom(
                     fixedSize: const Size(400, 60),
                     backgroundColor: AppColors.button,
@@ -234,6 +237,11 @@ class _HomePageState extends State<HomePage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                  ),
+                  child: textPoppins(
+                    "Keluar",
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),

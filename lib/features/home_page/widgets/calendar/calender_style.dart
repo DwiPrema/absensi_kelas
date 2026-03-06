@@ -8,7 +8,7 @@ class CalenderStyle {
       case DayType.past:
         return [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
+            color: Colors.grey.withAlpha(50),
             offset: const Offset(-3, 3),
             blurRadius: 1,
             spreadRadius: 1,
@@ -17,7 +17,7 @@ class CalenderStyle {
       case DayType.future:
         return [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
+            color: Colors.grey.withAlpha(50),
             offset: const Offset(3, 3),
             blurRadius: 1,
             spreadRadius: 1,
@@ -26,7 +26,7 @@ class CalenderStyle {
       case DayType.today:
         return [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
+            color: Colors.grey.withAlpha(50),
             offset: const Offset(0, 3),
             blurRadius: 1,
             spreadRadius: 1,

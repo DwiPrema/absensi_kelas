@@ -1,7 +1,7 @@
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:absensi_kelas/core/constant/app_colors.dart';
-import 'widget/box_absen.dart';
+import '../widget/box_absen.dart';
 
 // 1. Kelas Utama: StatelessWidget (immutable)
 class AbsenPage extends StatefulWidget {

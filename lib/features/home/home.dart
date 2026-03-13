@@ -1,7 +1,7 @@
 import 'package:absensi_kelas/core/enums/enum.dart';
-import 'package:absensi_kelas/features/absen_page/absen_page.dart';
-import 'package:absensi_kelas/features/home_page/widgets/calendar/calender.dart';
-import 'package:absensi_kelas/features/home_page/widgets/card/card_kelas.dart';
+import 'package:absensi_kelas/features/attendance/ui/absen_page.dart';
+import 'package:absensi_kelas/features/home/widgets/calendar/calender.dart';
+import 'package:absensi_kelas/features/home/widgets/card/card_kelas.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import '../../core/constant/app_colors.dart';

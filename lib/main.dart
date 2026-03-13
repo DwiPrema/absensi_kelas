@@ -1,7 +1,12 @@
+import 'package:absensi_kelas/core/database/global_service.dart';
 import 'package:flutter/material.dart';
-import 'package:absensi_kelas/features/home_page/home.dart';
+import 'package:absensi_kelas/features/home/home.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await DatabaseService.setup();
+  
   runApp(const MyApp());
 }
 

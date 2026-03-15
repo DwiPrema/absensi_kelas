@@ -1,18 +1,18 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
+import 'package:absensi_kelas/widgets/button.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 
 class CardKelas extends StatelessWidget {
-  // Properties / Atribut
   final Color maincolor;
   final Color gradientcolor;
   final String namakelas;
   final String jumlahsiswa;
   final Color buttoncolor;
-  final Function(String)
-      absen; // 👈 UBAH JADI Function(String) BUKAN VoidCallback
+  final VoidCallback onTapEdit;
+  final VoidCallback onTapRemove;
+  final VoidCallback onTapAbsen;
 
-  // Constructor
   const CardKelas({
     super.key,
     required this.maincolor,
@@ -20,12 +20,15 @@ class CardKelas extends StatelessWidget {
     required this.namakelas,
     required this.jumlahsiswa,
     required this.buttoncolor,
-    required this.absen, // Terima callback DENGAN parameter String
+    required this.onTapEdit,
+    required this.onTapRemove,
+    required this.onTapAbsen,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -39,64 +42,74 @@ class CardKelas extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Nama Kelas
-          textPagratiNarrow(namakelas,
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              color: AppColors.white),
-          const SizedBox(height: 4),
-
-          // Jumlah Siswa
-          textPagratiNarrow(jumlahsiswa, fontSize: 20, color: Colors.white),
-          const SizedBox(height: 10),
-
-          // Button Absen di kanan
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  // ✅ PANGGIL callback DENGAN parameter namakelas
-                  absen(namakelas);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttoncolor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+              textPagratiNarrow(namakelas,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.black.withAlpha(200)),
+              const SizedBox(width: 16),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: onTapRemove,
+                    child: Icon(
+                      Icons.delete,
+                      size: 24,
+                      color: AppColors.black.withAlpha(200),
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
+                  const SizedBox(
+                    width: 8,
                   ),
-                ),
-                child: textPoppins("Absen",
-                    fontSize: 14, fontWeight: FontWeight.w600),
-              ),
+                  GestureDetector(
+                    onTap: onTapEdit,
+                    child: Icon(
+                      Icons.edit_square,
+                      size: 24,
+                      color: AppColors.black.withAlpha(200),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.people_alt_rounded, size: 18, color: AppColors.black.withAlpha(180),),
+              const SizedBox(width: 8,),
+              textPoppins("$jumlahsiswa siswa",
+              fontSize: 12, color: Colors.black),
+            ],
+          ),
+
+          const SizedBox(height: 32),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Button(
+                  text: "Data Siswa",
+                  textColor: AppColors.black.withAlpha(200),
+                  bgColor: buttoncolor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  borderRadius: BorderRadius.circular(10),
+                  onPressed: () {}),
               const SizedBox(
                 width: 24,
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SiswaPresentation()));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttoncolor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                ),
-                child: textPoppins("Lihat Data",
-                    fontSize: 14, fontWeight: FontWeight.w600),
-              ),
+              Button(
+                  text: "Mulai Absensi",
+                  textColor: AppColors.black.withAlpha(200),
+                  bgColor: buttoncolor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  borderRadius: BorderRadius.circular(10),
+                  onPressed: onTapAbsen),
             ],
           )
         ],

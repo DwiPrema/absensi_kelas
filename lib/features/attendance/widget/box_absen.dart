@@ -217,7 +217,7 @@ class _BoxAbsenState extends State<BoxAbsen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(
-                    child: textInriaSans(
+                    child: textPagratiNarrow(
                       _currentStatus,
                       fontSize: 16,
                       color: AppColors.white,

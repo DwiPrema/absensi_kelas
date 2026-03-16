@@ -40,20 +40,20 @@ Widget textPoppins(
 }
 
 
-Widget textInriaSans(
-  String text, {
-  TextAlign textAlign = TextAlign.left,
-  Color color = AppColors.white,
-  double fontSize = 12,
-  FontWeight fontWeight = FontWeight.w400,
-}) {
-  return Text(
-    text,
-    textAlign: textAlign,
-    style: GoogleFonts.inriaSans(
-      fontSize: fontSize,
-      fontWeight: fontWeight,
-      color: color,
-    ),
-  );
-}
+// Widget textInriaSans(
+//   String text, {
+//   TextAlign textAlign = TextAlign.left,
+//   Color color = AppColors.white,
+//   double fontSize = 12,
+//   FontWeight fontWeight = FontWeight.w400,
+// }) {
+//   return Text(
+//     text,
+//     textAlign: textAlign,
+//     style: GoogleFonts.inriaSans(
+//       fontSize: fontSize,
+//       fontWeight: fontWeight,
+//       color: color,
+//     ),
+//   );
+// }

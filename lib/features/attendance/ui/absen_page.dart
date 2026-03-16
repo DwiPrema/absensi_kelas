@@ -117,8 +117,8 @@ class _AbsenPageState extends State<AbsenPage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  textInriaSans("Jumlah", fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.white),
-                                  textInriaSans("17", color: AppColors.white, fontSize: 32, fontWeight: FontWeight.w700),
+                                  textPagratiNarrow("Jumlah", fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.white),
+                                  textPagratiNarrow("17", color: AppColors.white, fontSize: 32, fontWeight: FontWeight.w700),
                                 ],
                               ),
                             ),
@@ -137,9 +137,9 @@ class _AbsenPageState extends State<AbsenPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                textInriaSans(day, fontSize: 32, fontWeight: FontWeight.w700,color: AppColors.white),
+                                textPagratiNarrow(day, fontSize: 32, fontWeight: FontWeight.w700,color: AppColors.white),
                                 const SizedBox(width: 10),
-                                textInriaSans('${_getMonthName(now.month)}\n${now.year}', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.white),
+                                textPagratiNarrow('${_getMonthName(now.month)}\n${now.year}', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.white),
                               ],
                             ),
                           ),

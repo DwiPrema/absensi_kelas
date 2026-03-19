@@ -1,7 +1,7 @@
-# 📚 Aplikasi Absensi Kelas RPL (Flutter + Isar)
+# 📚 Aplikasi Absensi Kelas (Flutter + Isar)
 
 Aplikasi **Absensi Kelas** sederhana yang dibuat menggunakan **Flutter** dan **Isar Database**.
-Aplikasi ini dirancang untuk membantu pencatatan kehadiran siswa pada **Jurusan Rekayasa Perangkat Lunak (RPL)** secara cepat dan efisien.
+Aplikasi ini dirancang untuk membantu pencatatan kehadiran siswa pada beberapa kelas secara cepat dan efisien.
 
 Project ini merupakan **rilis awal yang stabil**, dengan fokus pada implementasi fitur inti absensi.
 
@@ -10,6 +10,7 @@ Project ini merupakan **rilis awal yang stabil**, dengan fokus pada implementasi
 ## 🚀 Teknologi yang Digunakan
 
 * **Flutter**: 3.16.9
+* **State Management**: Riverpod
 * **Dart**: 3.2.6
 * **Database**: Isar
 * **Platform**: Android, iOS, Web, Desktop
@@ -69,16 +70,6 @@ fvm flutter pub get
 ```bash
 fvm flutter run
 ```
-
----
-
-## 📂 Status Pengembangan Project
-
-* ✅ Inisialisasi project
-* ✅ Konfigurasi Flutter & Isar
-* ✅ Implementasi UI
-* ⏳ Fitur CRUD data absensi
-* ⏳ Kategori status kehadiran (Hadir, Izin, Sakit, Alpha)
 
 ---
 

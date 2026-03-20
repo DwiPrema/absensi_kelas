@@ -26,6 +26,8 @@ class AttendanceService {
 
   ///Delete Attendance Data
   Future<void> deleteAttenData(int id) async {
-    await DatabaseService.isarDb.attendances.delete(id);
+    await DatabaseService.isarDb.writeTxn(() async {
+      await DatabaseService.isarDb.attendances.delete(id);
+    });
   }
 }

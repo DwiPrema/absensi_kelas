@@ -9,10 +9,10 @@ class Attendance {
   Id attendanceId = Isar.autoIncrement;
 
   @Index()
-  final student = IsarLink<Student>();
+  final student = IsarLinks<Student>();
 
   @Index()
-  late DateTime dateTime;
+  DateTime dateTime = DateTime.now();
 
   @enumerated
   StatusKehadiran statusKehadiran = StatusKehadiran.hadir;

@@ -11,7 +11,6 @@ class BoxAbsen extends StatefulWidget {
   final String? nisn;
   final StatusKehadiran status;
   final Function(StatusKehadiran)? onStatusChanged;
-  final VoidCallback? onTap;
 
   const BoxAbsen({
     super.key,
@@ -21,7 +20,6 @@ class BoxAbsen extends StatefulWidget {
     this.nisn,
     this.status = StatusKehadiran.hadir,
     this.onStatusChanged,
-    this.onTap,
   });
 
   @override
@@ -136,44 +134,30 @@ class _BoxAbsenState extends State<BoxAbsen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Container(
-        height: 130,
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withAlpha(130),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 8,
-              left: 80,
-              right: 30,
-              child: Text(
-                widget.nama,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Positioned(
-              right: 0,
-              top: 4,
-              child: Container(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withAlpha(130),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
                 height: 25,
                 width: 25,
                 margin: const EdgeInsets.only(top: 2),
@@ -189,32 +173,43 @@ class _BoxAbsenState extends State<BoxAbsen> {
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 2,
-              right: 2,
-              child: GestureDetector(
-                onTap: _showStatusDialog,
-                child: Container(
-                  width: 122,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(_currentStatus),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: textPagratiNarrow(
-                      _getStatusLabel(_currentStatus),
-                      fontSize: 16,
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+              const SizedBox(
+                width: 24,
+              ),
+              Text(
+                widget.nama,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          GestureDetector(
+            onTap: _showStatusDialog,
+            child: Container(
+              width: 122,
+              height: 35,
+              decoration: BoxDecoration(
+                color: _getStatusColor(_currentStatus),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: textPagratiNarrow(
+                  _getStatusLabel(_currentStatus),
+                  fontSize: 16,
+                  color: AppColors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

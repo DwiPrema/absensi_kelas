@@ -1,5 +1,5 @@
 import 'package:absensi_kelas/core/enums/enum.dart';
-import 'package:absensi_kelas/features/attendance/ui/absen_page.dart';
+import 'package:absensi_kelas/features/attendance/ui/attendance.dart';
 import 'package:absensi_kelas/features/home/widgets/calendar/calender.dart';
 import 'package:absensi_kelas/features/home/widgets/card/card_kelas.dart';
 import 'package:absensi_kelas/features/school_classes/models/school_class_model.dart';
@@ -10,6 +10,7 @@ import 'package:absensi_kelas/widgets/text_field_widget.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../core/constant/app_colors.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -35,27 +36,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         List.generate(5, (index) => today.add(Duration(days: index - 2)));
   }
 
-  String _getDayName(DateTime date) {
-    const weekdays = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-    return weekdays[date.weekday - 1];
+  String _getDayName(DateTime date, String locale) {
+    return DateFormat('EEE', locale).format(date).toString();
   }
 
-  String _getMonthName(DateTime date) {
-    const months = [
-      'Januari',
-      'Februari',
-      'Maret',
-      'April',
-      'Mei',
-      'Juni',
-      'Juli',
-      'Agustus',
-      'September',
-      'Oktober',
-      'November',
-      'Desember'
-    ];
-    return months[date.month - 1];
+  String _getMonthName(String locale) {
+    return DateFormat('MMMM', locale).format(DateTime.now());
   }
 
   DayType _getDayType(DateTime date) {
@@ -67,7 +53,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     return DayType.today;
   }
 
-  void _showDialogRemove({required int id, required SchoolClass schClass, required String jumlahSiswa}) {
+  void _showDialogRemove(
+      {required int id,
+      required SchoolClass schClass,
+      required String jumlahSiswa}) {
     showDialog(
       context: context,
       builder: (context) {
@@ -83,8 +72,13 @@ class _HomePageState extends ConsumerState<HomePage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              textPoppins("Perhatian! : Menghapus kelas ini akan menghapus seluruh data siswa yang ada di dalamnya", color: AppColors.redAlpha.withAlpha(180), fontWeight: FontWeight.w700),
-              const SizedBox(height: 50,),
+              textPoppins(
+                  "Perhatian! : Menghapus kelas ini akan menghapus seluruh data siswa yang ada di dalamnya",
+                  color: AppColors.redAlpha.withAlpha(180),
+                  fontWeight: FontWeight.w700),
+              const SizedBox(
+                height: 50,
+              ),
               textPoppins("Kelas : ${schClass.schClassName}",
                   fontSize: 14, color: AppColors.black),
               const SizedBox(
@@ -136,8 +130,12 @@ class _HomePageState extends ConsumerState<HomePage> {
           backgroundColor: AppColors.background,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(schoolClass == null ? "Tambah Data Kelas" : "Edit Data Kelas"),
-          content: textFieldWidget(labelText: "Nama Kelas", controller: controller, textFieldType: TextFieldType.outline),
+          title: Text(
+              schoolClass == null ? "Tambah Data Kelas" : "Edit Data Kelas"),
+          content: textFieldWidget(
+              labelText: "Nama Kelas",
+              controller: controller,
+              textFieldType: TextFieldType.outline),
           actions: [
             Button(
                 text: "Batal",
@@ -179,6 +177,25 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
+  Widget _buildCalendarCard(
+    int index,
+    double width,
+    double height,
+    double nameSize,
+    double dateSize,
+    String locale,
+  ) {
+    return CalendarCard(
+      date: weekDays[index],
+      cardWidth: width,
+      cardHeight: height,
+      dayNameFontSize: nameSize,
+      dateFontSize: dateSize,
+      getDayType: _getDayType,
+      getDayName: (date) => _getDayName(date, locale),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final schClassState = ref.watch(schClassProvider);
@@ -195,6 +212,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       AppColors.blueGradient,
     ];
 
+    final locale = Localizations.localeOf(context).toString();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
@@ -207,7 +226,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 Center(
                   child: Container(
-                    child: textPagratiNarrow('${_getMonthName(today)} ',
+                    child: textPagratiNarrow('${_getMonthName(locale)} ',
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
                         color: AppColors.black),
@@ -216,11 +235,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildCalendarCard(0, 50, 105, 13, 17),
-                    _buildCalendarCard(1, 60, 130, 15, 22),
-                    _buildCalendarCard(2, 80, 160, 17, 29),
-                    _buildCalendarCard(3, 60, 130, 15, 22),
-                    _buildCalendarCard(4, 50, 105, 13, 17),
+                    _buildCalendarCard(0, 50, 105, 13, 17, locale),
+                    _buildCalendarCard(1, 60, 130, 15, 22, locale),
+                    _buildCalendarCard(2, 80, 160, 17, 29, locale),
+                    _buildCalendarCard(3, 60, 130, 15, 22, locale),
+                    _buildCalendarCard(4, 50, 105, 13, 17, locale),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -277,15 +296,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                           onTapEdit: () =>
                               _showDialogData(schoolClass: schClass),
                           onTapRemove: () => _showDialogRemove(
-                              id: schClass.schoolClassId, schClass: schClass, jumlahSiswa: totalStudent.toString()),
+                              id: schClass.schoolClassId,
+                              schClass: schClass,
+                              jumlahSiswa: totalStudent.toString()),
                           onTapAbsen: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => AbsenPage(
+                                    builder: (context) => Attendance(
                                           headerColor: mainColor,
                                           gradientHeaderColor: gradientColor,
                                           schoolClassId: schClass.schoolClassId,
+                                          schoolClassName: schClass.schClassName,
                                         )));
                           },
                         );
@@ -302,19 +324,6 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildCalendarCard(int index, double width, double height,
-      double nameSize, double dateSize) {
-    return CalendarCard(
-      date: weekDays[index],
-      cardWidth: width,
-      cardHeight: height,
-      dayNameFontSize: nameSize,
-      dateFontSize: dateSize,
-      getDayType: _getDayType,
-      getDayName: _getDayName,
     );
   }
 }

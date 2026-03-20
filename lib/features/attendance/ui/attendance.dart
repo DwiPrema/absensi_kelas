@@ -6,48 +6,35 @@ import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class AbsenPage extends ConsumerStatefulWidget {
+class Attendance extends ConsumerStatefulWidget {
   final Color headerColor;
   final Color gradientHeaderColor;
   final int schoolClassId;
+  final String schoolClassName;
 
-  const AbsenPage({
+  const Attendance({
     super.key,
     required this.headerColor,
     required this.gradientHeaderColor,
     required this.schoolClassId,
+    required this.schoolClassName,
   });
 
   @override
-  ConsumerState<AbsenPage> createState() => _AbsenPageState();
+  ConsumerState<Attendance> createState() => _AttendanceState();
 }
 
-class _AbsenPageState extends ConsumerState<AbsenPage> {
-  late DateTime now;
-
-  @override
-  void initState() {
-    super.initState();
-    now = DateTime.now();
-    _updateTime();
-  }
-
-  void _updateTime() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (!mounted) return;
-      setState(() {
-        now = DateTime.now();
-      });
-      _updateTime();
-    });
-  }
-
+class _AttendanceState extends ConsumerState<Attendance> {
   @override
   Widget build(BuildContext context) {
     final studentState = ref.watch(studentProviders(widget.schoolClassId));
 
-    final String day = DateFormat('dd').format(now);
-    final String date = DateFormat('dd MMM').format(now);
+    final dateNow = DateTime.now();
+
+    final locale = Localizations.localeOf(context).toString();
+
+    final String day = DateFormat('EEEE', locale).format(dateNow);
+    final String date = DateFormat('dd MMM', locale).format(dateNow);
 
     final students = studentState.value ?? [];
     final totalStudents = students.length;
@@ -83,10 +70,10 @@ class _AbsenPageState extends ConsumerState<AbsenPage> {
                             ),
                           ),
                           child: Center(
-                            child: textPoppins(
-                              "Kelas 11 RPL",
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
+                            child: textPagratiNarrow(
+                              widget.schoolClassName,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.white,
                             ),
                           ),
@@ -151,7 +138,6 @@ class _AbsenPageState extends ConsumerState<AbsenPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 50),
 
                     /// LIST SISWA
                     studentState.when(
@@ -165,12 +151,17 @@ class _AbsenPageState extends ConsumerState<AbsenPage> {
                           );
                         }
 
+                        final sortedList = [...studentList];
+
+                        sortedList.sort((a, b) => int.parse(a.rollNum)
+                            .compareTo(int.parse(b.rollNum)));
+
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: studentList.length,
+                          itemCount: sortedList.length,
                           itemBuilder: (context, index) {
-                            final student = studentList[index];
+                            final student = sortedList[index];
 
                             return BoxAbsen(
                               nama: student.name,

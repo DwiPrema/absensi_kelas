@@ -17,16 +17,21 @@ const AttendanceSchema = CollectionSchema(
   name: r'Attendance',
   id: 4618409064190326501,
   properties: {
-    r'dateTime': PropertySchema(
+    r'classId': PropertySchema(
       id: 0,
+      name: r'classId',
+      type: IsarType.long,
+    ),
+    r'dateTime': PropertySchema(
+      id: 1,
       name: r'dateTime',
       type: IsarType.dateTime,
     ),
-    r'statusKehadiran': PropertySchema(
-      id: 1,
-      name: r'statusKehadiran',
-      type: IsarType.byte,
-      enumMap: _AttendancestatusKehadiranEnumValueMap,
+    r'details': PropertySchema(
+      id: 2,
+      name: r'details',
+      type: IsarType.objectList,
+      target: r'AttendanceDetail',
     )
   },
   estimateSize: _attendanceEstimateSize,
@@ -35,6 +40,19 @@ const AttendanceSchema = CollectionSchema(
   deserializeProp: _attendanceDeserializeProp,
   idName: r'attendanceId',
   indexes: {
+    r'classId': IndexSchema(
+      id: 5352960816261817663,
+      name: r'classId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'classId',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
     r'dateTime': IndexSchema(
       id: -138851979697481250,
       name: r'dateTime',
@@ -49,15 +67,8 @@ const AttendanceSchema = CollectionSchema(
       ],
     )
   },
-  links: {
-    r'student': LinkSchema(
-      id: -4958411165641712432,
-      name: r'student',
-      target: r'Student',
-      single: true,
-    )
-  },
-  embeddedSchemas: {},
+  links: {},
+  embeddedSchemas: {r'AttendanceDetail': AttendanceDetailSchema},
   getId: _attendanceGetId,
   getLinks: _attendanceGetLinks,
   attach: _attendanceAttach,
@@ -70,6 +81,15 @@ int _attendanceEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.details.length * 3;
+  {
+    final offsets = allOffsets[AttendanceDetail]!;
+    for (var i = 0; i < object.details.length; i++) {
+      final value = object.details[i];
+      bytesCount +=
+          AttendanceDetailSchema.estimateSize(value, offsets, allOffsets);
+    }
+  }
   return bytesCount;
 }
 
@@ -79,8 +99,14 @@ void _attendanceSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTime(offsets[0], object.dateTime);
-  writer.writeByte(offsets[1], object.statusKehadiran.index);
+  writer.writeLong(offsets[0], object.classId);
+  writer.writeDateTime(offsets[1], object.dateTime);
+  writer.writeObjectList<AttendanceDetail>(
+    offsets[2],
+    allOffsets,
+    AttendanceDetailSchema.serialize,
+    object.details,
+  );
 }
 
 Attendance _attendanceDeserialize(
@@ -91,10 +117,15 @@ Attendance _attendanceDeserialize(
 ) {
   final object = Attendance();
   object.attendanceId = id;
-  object.dateTime = reader.readDateTime(offsets[0]);
-  object.statusKehadiran = _AttendancestatusKehadiranValueEnumMap[
-          reader.readByteOrNull(offsets[1])] ??
-      StatusKehadiran.hadir;
+  object.classId = reader.readLong(offsets[0]);
+  object.dateTime = reader.readDateTime(offsets[1]);
+  object.details = reader.readObjectList<AttendanceDetail>(
+        offsets[2],
+        AttendanceDetailSchema.deserialize,
+        allOffsets,
+        AttendanceDetail(),
+      ) ??
+      [];
   return object;
 }
 
@@ -106,40 +137,32 @@ P _attendanceDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
-      return (_AttendancestatusKehadiranValueEnumMap[
-              reader.readByteOrNull(offset)] ??
-          StatusKehadiran.hadir) as P;
+      return (reader.readDateTime(offset)) as P;
+    case 2:
+      return (reader.readObjectList<AttendanceDetail>(
+            offset,
+            AttendanceDetailSchema.deserialize,
+            allOffsets,
+            AttendanceDetail(),
+          ) ??
+          []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
-
-const _AttendancestatusKehadiranEnumValueMap = {
-  'hadir': 0,
-  'sakit': 1,
-  'alpha': 2,
-  'izin': 3,
-};
-const _AttendancestatusKehadiranValueEnumMap = {
-  0: StatusKehadiran.hadir,
-  1: StatusKehadiran.sakit,
-  2: StatusKehadiran.alpha,
-  3: StatusKehadiran.izin,
-};
 
 Id _attendanceGetId(Attendance object) {
   return object.attendanceId;
 }
 
 List<IsarLinkBase<dynamic>> _attendanceGetLinks(Attendance object) {
-  return [object.student];
+  return [];
 }
 
 void _attendanceAttach(IsarCollection<dynamic> col, Id id, Attendance object) {
   object.attendanceId = id;
-  object.student.attach(col, col.isar.collection<Student>(), r'student', id);
 }
 
 extension AttendanceQueryWhereSort
@@ -147,6 +170,14 @@ extension AttendanceQueryWhereSort
   QueryBuilder<Attendance, Attendance, QAfterWhere> anyAttendanceId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterWhere> anyClassId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'classId'),
+      );
     });
   }
 
@@ -226,6 +257,96 @@ extension AttendanceQueryWhere
         lower: lowerAttendanceId,
         includeLower: includeLower,
         upper: upperAttendanceId,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterWhereClause> classIdEqualTo(
+      int classId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'classId',
+        value: [classId],
+      ));
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterWhereClause> classIdNotEqualTo(
+      int classId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'classId',
+              lower: [],
+              upper: [classId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'classId',
+              lower: [classId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'classId',
+              lower: [classId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'classId',
+              lower: [],
+              upper: [classId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterWhereClause> classIdGreaterThan(
+    int classId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'classId',
+        lower: [classId],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterWhereClause> classIdLessThan(
+    int classId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'classId',
+        lower: [],
+        upper: [classId],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterWhereClause> classIdBetween(
+    int lowerClassId,
+    int upperClassId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'classId',
+        lower: [lowerClassId],
+        includeLower: includeLower,
+        upper: [upperClassId],
         includeUpper: includeUpper,
       ));
     });
@@ -380,6 +501,60 @@ extension AttendanceQueryFilter
     });
   }
 
+  QueryBuilder<Attendance, Attendance, QAfterFilterCondition> classIdEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'classId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterFilterCondition>
+      classIdGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'classId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterFilterCondition> classIdLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'classId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterFilterCondition> classIdBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'classId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Attendance, Attendance, QAfterFilterCondition> dateTimeEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -435,83 +610,121 @@ extension AttendanceQueryFilter
   }
 
   QueryBuilder<Attendance, Attendance, QAfterFilterCondition>
-      statusKehadiranEqualTo(StatusKehadiran value) {
+      detailsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'statusKehadiran',
-        value: value,
-      ));
+      return query.listLength(
+        r'details',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterFilterCondition> detailsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'details',
+        0,
+        true,
+        0,
+        true,
+      );
     });
   }
 
   QueryBuilder<Attendance, Attendance, QAfterFilterCondition>
-      statusKehadiranGreaterThan(
-    StatusKehadiran value, {
+      detailsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'details',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterFilterCondition>
+      detailsLengthLessThan(
+    int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'statusKehadiran',
-        value: value,
-      ));
+      return query.listLength(
+        r'details',
+        0,
+        true,
+        length,
+        include,
+      );
     });
   }
 
   QueryBuilder<Attendance, Attendance, QAfterFilterCondition>
-      statusKehadiranLessThan(
-    StatusKehadiran value, {
+      detailsLengthGreaterThan(
+    int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'statusKehadiran',
-        value: value,
-      ));
+      return query.listLength(
+        r'details',
+        length,
+        include,
+        999999,
+        true,
+      );
     });
   }
 
   QueryBuilder<Attendance, Attendance, QAfterFilterCondition>
-      statusKehadiranBetween(
-    StatusKehadiran lower,
-    StatusKehadiran upper, {
+      detailsLengthBetween(
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'statusKehadiran',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.listLength(
+        r'details',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 }
 
 extension AttendanceQueryObject
-    on QueryBuilder<Attendance, Attendance, QFilterCondition> {}
-
-extension AttendanceQueryLinks
     on QueryBuilder<Attendance, Attendance, QFilterCondition> {
-  QueryBuilder<Attendance, Attendance, QAfterFilterCondition> student(
-      FilterQuery<Student> q) {
+  QueryBuilder<Attendance, Attendance, QAfterFilterCondition> detailsElement(
+      FilterQuery<AttendanceDetail> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'student');
-    });
-  }
-
-  QueryBuilder<Attendance, Attendance, QAfterFilterCondition> studentIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'student', 0, true, 0, true);
+      return query.object(q, r'details');
     });
   }
 }
 
+extension AttendanceQueryLinks
+    on QueryBuilder<Attendance, Attendance, QFilterCondition> {}
+
 extension AttendanceQuerySortBy
     on QueryBuilder<Attendance, Attendance, QSortBy> {
+  QueryBuilder<Attendance, Attendance, QAfterSortBy> sortByClassId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'classId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterSortBy> sortByClassIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'classId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attendance, Attendance, QAfterSortBy> sortByDateTime() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateTime', Sort.asc);
@@ -521,19 +734,6 @@ extension AttendanceQuerySortBy
   QueryBuilder<Attendance, Attendance, QAfterSortBy> sortByDateTimeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateTime', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Attendance, Attendance, QAfterSortBy> sortByStatusKehadiran() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'statusKehadiran', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Attendance, Attendance, QAfterSortBy>
-      sortByStatusKehadiranDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'statusKehadiran', Sort.desc);
     });
   }
 }
@@ -552,6 +752,18 @@ extension AttendanceQuerySortThenBy
     });
   }
 
+  QueryBuilder<Attendance, Attendance, QAfterSortBy> thenByClassId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'classId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attendance, Attendance, QAfterSortBy> thenByClassIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'classId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attendance, Attendance, QAfterSortBy> thenByDateTime() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateTime', Sort.asc);
@@ -563,32 +775,19 @@ extension AttendanceQuerySortThenBy
       return query.addSortBy(r'dateTime', Sort.desc);
     });
   }
-
-  QueryBuilder<Attendance, Attendance, QAfterSortBy> thenByStatusKehadiran() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'statusKehadiran', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Attendance, Attendance, QAfterSortBy>
-      thenByStatusKehadiranDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'statusKehadiran', Sort.desc);
-    });
-  }
 }
 
 extension AttendanceQueryWhereDistinct
     on QueryBuilder<Attendance, Attendance, QDistinct> {
-  QueryBuilder<Attendance, Attendance, QDistinct> distinctByDateTime() {
+  QueryBuilder<Attendance, Attendance, QDistinct> distinctByClassId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'dateTime');
+      return query.addDistinctBy(r'classId');
     });
   }
 
-  QueryBuilder<Attendance, Attendance, QDistinct> distinctByStatusKehadiran() {
+  QueryBuilder<Attendance, Attendance, QDistinct> distinctByDateTime() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'statusKehadiran');
+      return query.addDistinctBy(r'dateTime');
     });
   }
 }
@@ -601,16 +800,233 @@ extension AttendanceQueryProperty
     });
   }
 
+  QueryBuilder<Attendance, int, QQueryOperations> classIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'classId');
+    });
+  }
+
   QueryBuilder<Attendance, DateTime, QQueryOperations> dateTimeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'dateTime');
     });
   }
 
-  QueryBuilder<Attendance, StatusKehadiran, QQueryOperations>
-      statusKehadiranProperty() {
+  QueryBuilder<Attendance, List<AttendanceDetail>, QQueryOperations>
+      detailsProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'statusKehadiran');
+      return query.addPropertyName(r'details');
     });
   }
 }
+
+// **************************************************************************
+// IsarEmbeddedGenerator
+// **************************************************************************
+
+// coverage:ignore-file
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
+
+const AttendanceDetailSchema = Schema(
+  name: r'AttendanceDetail',
+  id: 1998897336995708324,
+  properties: {
+    r'status': PropertySchema(
+      id: 0,
+      name: r'status',
+      type: IsarType.byte,
+      enumMap: _AttendanceDetailstatusEnumValueMap,
+    ),
+    r'studentId': PropertySchema(
+      id: 1,
+      name: r'studentId',
+      type: IsarType.long,
+    )
+  },
+  estimateSize: _attendanceDetailEstimateSize,
+  serialize: _attendanceDetailSerialize,
+  deserialize: _attendanceDetailDeserialize,
+  deserializeProp: _attendanceDetailDeserializeProp,
+);
+
+int _attendanceDetailEstimateSize(
+  AttendanceDetail object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  return bytesCount;
+}
+
+void _attendanceDetailSerialize(
+  AttendanceDetail object,
+  IsarWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  writer.writeByte(offsets[0], object.status.index);
+  writer.writeLong(offsets[1], object.studentId);
+}
+
+AttendanceDetail _attendanceDetailDeserialize(
+  Id id,
+  IsarReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  final object = AttendanceDetail();
+  object.status =
+      _AttendanceDetailstatusValueEnumMap[reader.readByteOrNull(offsets[0])] ??
+          StatusKehadiran.hadir;
+  object.studentId = reader.readLong(offsets[1]);
+  return object;
+}
+
+P _attendanceDetailDeserializeProp<P>(
+  IsarReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
+    case 0:
+      return (_AttendanceDetailstatusValueEnumMap[
+              reader.readByteOrNull(offset)] ??
+          StatusKehadiran.hadir) as P;
+    case 1:
+      return (reader.readLong(offset)) as P;
+    default:
+      throw IsarError('Unknown property with id $propertyId');
+  }
+}
+
+const _AttendanceDetailstatusEnumValueMap = {
+  'hadir': 0,
+  'sakit': 1,
+  'alpha': 2,
+  'izin': 3,
+};
+const _AttendanceDetailstatusValueEnumMap = {
+  0: StatusKehadiran.hadir,
+  1: StatusKehadiran.sakit,
+  2: StatusKehadiran.alpha,
+  3: StatusKehadiran.izin,
+};
+
+extension AttendanceDetailQueryFilter
+    on QueryBuilder<AttendanceDetail, AttendanceDetail, QFilterCondition> {
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      statusEqualTo(StatusKehadiran value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      statusGreaterThan(
+    StatusKehadiran value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      statusLessThan(
+    StatusKehadiran value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      statusBetween(
+    StatusKehadiran lower,
+    StatusKehadiran upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'status',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      studentIdEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'studentId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      studentIdGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'studentId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      studentIdLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'studentId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceDetail, AttendanceDetail, QAfterFilterCondition>
+      studentIdBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'studentId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+}
+
+extension AttendanceDetailQueryObject
+    on QueryBuilder<AttendanceDetail, AttendanceDetail, QFilterCondition> {}

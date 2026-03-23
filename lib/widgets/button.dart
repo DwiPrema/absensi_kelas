@@ -9,9 +9,10 @@ class Button extends StatelessWidget {
   final FontWeight fontWeight;
   final BorderRadius borderRadius;
   final VoidCallback onPressed;
+  final double paddingVertical;
+  final double paddingHorizontal;
 
-
-/// A customizable button widget.
+  /// A customizable button widget.
   const Button({
     super.key,
     required this.text,
@@ -21,6 +22,8 @@ class Button extends StatelessWidget {
     required this.fontWeight,
     required this.borderRadius,
     required this.onPressed,
+    this.paddingVertical = 8,
+    this.paddingHorizontal = 16
   });
 
   @override
@@ -33,7 +36,7 @@ class Button extends StatelessWidget {
           borderRadius: borderRadius,
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: paddingHorizontal, vertical: paddingVertical),
           child: textPoppins(text,
               fontSize: fontSize, fontWeight: fontWeight, color: textColor),
         ),

@@ -1,4 +1,5 @@
 import 'package:absensi_kelas/core/database/global_service.dart';
+import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
 import 'package:isar/isar.dart';
 
@@ -7,7 +8,6 @@ class AttendanceService {
   Future<void> createAttenData(Attendance attendance) async {
     await DatabaseService.isarDb.writeTxn(() async {
       await DatabaseService.isarDb.attendances.put(attendance);
-      await attendance.student.save();
     });
   }
 
@@ -20,7 +20,6 @@ class AttendanceService {
   Future<void> updateAttenData(Attendance attendance) async {
     await DatabaseService.isarDb.writeTxn(() async {
       await DatabaseService.isarDb.attendances.put(attendance);
-      await attendance.student.save();
     });
   }
 
@@ -30,4 +29,61 @@ class AttendanceService {
       await DatabaseService.isarDb.attendances.delete(id);
     });
   }
+
+  Future<Map<StatusKehadiran, int>> getSumByStatus({
+    required int schClassId,
+    required DateTime date,
+  }) async {
+    final attendance = await DatabaseService.isarDb.attendances
+        .filter()
+        .classIdEqualTo(schClassId)
+        .and()
+        .dateTimeEqualTo(date)
+        .findFirst();
+
+    if (attendance == null) {
+      return {
+        StatusKehadiran.hadir: 0,
+        StatusKehadiran.sakit: 0,
+        StatusKehadiran.izin: 0,
+        StatusKehadiran.alpha: 0,
+      };
+    }
+
+    final result = {
+      StatusKehadiran.hadir: 0,
+      StatusKehadiran.sakit: 0,
+      StatusKehadiran.izin: 0,
+      StatusKehadiran.alpha: 0,
+    };
+
+    for (var item in attendance.details) {
+      result[item.status] = result[item.status]! + 1;
+    }
+
+    return result;
+  }
+
+  Future<bool> isAlreadyExist(int classId, DateTime date) async {
+    final data = await DatabaseService.isarDb.attendances
+        .filter()
+        .classIdEqualTo(classId)
+        .and()
+        .dateTimeEqualTo(date)
+        .findFirst();
+
+    return data != null;
+  }
+
+  Future<Attendance?> getAttendanceByClassAndDate({
+  required int classId,
+  required DateTime date,
+}) async {
+
+  return await DatabaseService.isarDb.attendances
+      .filter()
+      .classIdEqualTo(classId)
+      .dateTimeEqualTo(date)
+      .findFirst();
+}
 }

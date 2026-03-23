@@ -3,7 +3,8 @@ import 'package:absensi_kelas/features/attendance/services/attendance_service.da
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final attendanceProvider =
-    AsyncNotifierProvider<AttendanceNotifier, List<Attendance>>(AttendanceNotifier.new);
+    AsyncNotifierProvider<AttendanceNotifier, List<Attendance>>(
+        AttendanceNotifier.new);
 
 class AttendanceNotifier extends AsyncNotifier<List<Attendance>> {
   final service = AttendanceService();
@@ -40,3 +41,20 @@ class AttendanceNotifier extends AsyncNotifier<List<Attendance>> {
     });
   }
 }
+
+final summaryProvider = FutureProvider.family(
+  (ref, (int schClassId, DateTime date) param) async {
+    final service = AttendanceService();
+
+    return service.getSumByStatus(schClassId: param.$1, date: param.$2);
+  },
+);
+
+final attendanceByClassAndDateProvider =
+    FutureProvider.family<Attendance?, (int, DateTime)>(
+  (ref, param) async {
+    final service = AttendanceService();
+
+    return service.getAttendanceByClassAndDate(classId: param.$1, date: param.$2);
+  },
+);

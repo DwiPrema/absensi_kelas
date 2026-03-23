@@ -1,5 +1,6 @@
 import 'package:absensi_kelas/core/enums/enum.dart';
-import 'package:absensi_kelas/features/attendance/ui/attendance.dart';
+import 'package:absensi_kelas/core/utils/date_helper.dart';
+import 'package:absensi_kelas/features/attendance/ui/attendance_page.dart';
 import 'package:absensi_kelas/features/home/widgets/calendar/calender.dart';
 import 'package:absensi_kelas/features/home/widgets/card/card_kelas.dart';
 import 'package:absensi_kelas/features/school_classes/models/school_class_model.dart';
@@ -27,7 +28,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    today = DateTime.now();
+    today = DateHelper.todayOnly();
     _generateWeekDays();
   }
 
@@ -45,8 +46,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   DayType _getDayType(DateTime date) {
-    final now = DateTime.now();
-    final todayDate = DateTime(now.year, now.month, now.day);
+    final todayDate = DateHelper.todayOnly();
     final compareDate = DateTime(date.year, date.month, date.day);
     if (compareDate.isBefore(todayDate)) return DayType.past;
     if (compareDate.isAfter(todayDate)) return DayType.future;
@@ -73,7 +73,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               textPoppins(
-                  "Perhatian! : Menghapus kelas ini akan menghapus seluruh data siswa yang ada di dalamnya",
+                  "Perhatian! : Menghapus data kelas ini akan menghapus seluruh data siswa serta absensi yang ada di dalamnya",
                   color: AppColors.redAlpha.withAlpha(180),
                   fontWeight: FontWeight.w700),
               const SizedBox(
@@ -106,11 +106,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 borderRadius: BorderRadius.circular(10),
-                onPressed: () {
+                onPressed: () async {
                   final notifier = ref.read(schClassProvider.notifier);
 
-                  notifier.deleteData(id);
+                  await notifier.deleteData(id);
 
+                  if (!context.mounted) return;
                   Navigator.pop(context);
                 }),
           ],
@@ -154,7 +155,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 borderRadius: BorderRadius.circular(10),
-                onPressed: () {
+                onPressed: () async {
                   final schClassName = controller.text.trim();
                   if (schClassName.isEmpty) return;
 
@@ -162,13 +163,14 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                   if (schoolClass == null) {
                     final newClass = SchoolClass()..schClassName = schClassName;
-                    notifier.createData(newClass);
+                    await notifier.createData(newClass);
                   } else {
                     final updatedClass =
                         schoolClass.copyWith(schClassName: schClassName);
-                    notifier.updateData(updatedClass);
+                    await notifier.updateData(updatedClass);
                   }
 
+                  if (!context.mounted) return;
                   Navigator.pop(context);
                 }),
           ],
@@ -303,11 +305,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Attendance(
+                                    builder: (context) => AttendancePage(
                                           headerColor: mainColor,
                                           gradientHeaderColor: gradientColor,
                                           schoolClassId: schClass.schoolClassId,
-                                          schoolClassName: schClass.schClassName,
+                                          schoolClassName:
+                                              schClass.schClassName,
                                         )));
                           },
                         );

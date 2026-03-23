@@ -27,7 +27,7 @@ class SchClassNotifier extends AsyncNotifier<List<SchoolClass>> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      await service.deleteSchClassData(id);
+      await service.deleteSchClassDataWithRelation(id);
       return service.getAllSchClassData();
     });
   }

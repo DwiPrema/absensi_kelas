@@ -30,4 +30,5 @@ class AppColors {
   ///warna netral
   static const Color white = Colors.white;
   static const Color black = Colors.black;
+  static const Color grey = Color(0xfff5f5f5);
 }

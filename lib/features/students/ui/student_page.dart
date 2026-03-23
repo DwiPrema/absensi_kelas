@@ -70,12 +70,16 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                 height: 16,
               ),
               textFieldWidget(
-                  labelText: "NIS (Opsional)", controller: nisController, maxLength: 10),
+                  labelText: "NIS (Opsional)",
+                  controller: nisController,
+                  maxLength: 10),
               const SizedBox(
                 height: 16,
               ),
               textFieldWidget(
-                  labelText: "NISN (Opsional)", controller: nisnController, maxLength: 15),
+                  labelText: "NISN (Opsional)",
+                  controller: nisnController,
+                  maxLength: 15),
             ],
           ),
           actions: [
@@ -96,7 +100,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 borderRadius: BorderRadius.circular(10),
-                onPressed: () {
+                onPressed: () async {
                   FocusScope.of(context).unfocus();
                   final studentName = nameController.text.trim();
                   final rollNum = rollNumController.text.trim();
@@ -130,7 +134,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                       ..nisn = nisn.isEmpty ? '-' : nisn
                       ..schClass.value = widget.schoolClass;
 
-                    notifier.createData(newClass);
+                    await notifier.createData(newClass);
                   } else {
                     final updatedClass = student.copyWith(
                       name: studentName,
@@ -138,8 +142,10 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                       nis: nis,
                       nisn: nisn,
                     );
-                    notifier.updateData(updatedClass);
+                    await notifier.updateData(updatedClass);
                   }
+
+                  if (!context.mounted) return;
 
                   Navigator.pop(context);
                 }),
@@ -208,13 +214,14 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 borderRadius: BorderRadius.circular(10),
-                onPressed: () {
+                onPressed: () async {
                   final notifier = ref.read(
                       studentProviders(widget.schoolClass.schoolClassId)
                           .notifier);
 
-                  notifier.deleteData(student.studentId);
+                  await notifier.deleteData(student.studentId);
 
+                  if (!context.mounted) return;
                   Navigator.pop(context);
                 },
               ),
@@ -281,7 +288,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
             builder: (context, scrollController) {
               return Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF5F5F5),
+                  color: AppColors.grey,
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(35)),
                 ),
                 child: Column(
@@ -311,7 +318,8 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                           final sortedList = [...studentList];
 
                           sortedList.sort(
-                            (a, b) => int.parse(a.rollNum).compareTo(int.parse(b.rollNum)),
+                            (a, b) => int.parse(a.rollNum)
+                                .compareTo(int.parse(b.rollNum)),
                           );
 
                           return ListView.builder(

@@ -51,36 +51,38 @@ class _StudentPageState extends ConsumerState<StudentPage> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title:
               Text(student == null ? "Tambah Data Siswa" : "Edit Data Siswa"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(
-                height: 16,
-              ),
-              textFieldWidget(
-                  labelText: "Nama Siswa", controller: nameController),
-              const SizedBox(
-                height: 16,
-              ),
-              textFieldWidget(
-                  labelText: "No Absen",
-                  controller: rollNumController,
-                  maxLength: 2),
-              const SizedBox(
-                height: 16,
-              ),
-              textFieldWidget(
-                  labelText: "NIS (Opsional)",
-                  controller: nisController,
-                  maxLength: 10),
-              const SizedBox(
-                height: 16,
-              ),
-              textFieldWidget(
-                  labelText: "NISN (Opsional)",
-                  controller: nisnController,
-                  maxLength: 15),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  height: 16,
+                ),
+                textFieldWidget(
+                    labelText: "Nama Siswa", controller: nameController),
+                const SizedBox(
+                  height: 16,
+                ),
+                textFieldWidget(
+                    labelText: "No Absen",
+                    controller: rollNumController,
+                    maxLength: 2),
+                const SizedBox(
+                  height: 16,
+                ),
+                textFieldWidget(
+                    labelText: "NIS (Opsional)",
+                    controller: nisController,
+                    maxLength: 10),
+                const SizedBox(
+                  height: 16,
+                ),
+                textFieldWidget(
+                    labelText: "NISN (Opsional)",
+                    controller: nisnController,
+                    maxLength: 15),
+              ],
+            ),
           ),
           actions: [
             Button(
@@ -236,127 +238,184 @@ class _StudentPageState extends ConsumerState<StudentPage> {
         ref.watch(studentProviders(widget.schoolClass.schoolClassId));
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: widget.mainColor,
-      body: SafeArea(
-          child: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
-              child: Column(
-                children: [
-                  Center(
-                    child: textPagratiNarrow("Data Siswa",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        textAlign: TextAlign.center),
-                  ),
-                  const SizedBox(height: 50),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          textPoppins(widget.schoolClass.schClassName,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w300,
-                              textAlign: TextAlign.left),
-                        ],
-                      ),
-                      Button(
-                        text: "Tambah Data",
-                        textColor: AppColors.black,
-                        bgColor: AppColors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        borderRadius: BorderRadius.circular(5),
-                        onPressed: () => _showDialogData(),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
-          DraggableScrollableSheet(
-            snap: true,
-            initialChildSize: 0.75,
-            maxChildSize: 1.0,
-            minChildSize: 0.75,
-            builder: (context, scrollController) {
-              return Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.grey,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(35)),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 16),
-                      width: 70,
-                      height: 6,
-                      decoration: BoxDecoration(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: AppColors.grey,
+        body: SafeArea(
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(
+                decelerationRate: ScrollDecelerationRate.fast),
+            slivers: [
+              SliverAppBar(
+                elevation: 0.0,
+                backgroundColor: widget.mainColor,
+                expandedHeight: 250,
+                collapsedHeight: 95,
+                pinned: true,
+                automaticallyImplyLeading: false,
+                leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Container(
                         color: AppColors.black.withAlpha(50),
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Expanded(
-                      child: student.when(
-                        data: (studentList) {
-                          if (studentList.isEmpty) {
-                            return Center(
-                              child: textPoppins("Belum ada data siswa",
-                                  color: AppColors.black, fontSize: 12),
-                            );
-                          }
-
-                          final sortedList = [...studentList];
-
-                          sortedList.sort(
-                            (a, b) => int.parse(a.rollNum)
-                                .compareTo(int.parse(b.rollNum)),
-                          );
-
-                          return ListView.builder(
-                              controller: scrollController,
-                              itemCount: sortedList.length,
-                              itemBuilder: (context, index) {
-                                final student = sortedList[index];
-
-                                return CardStudent(
-                                    name: student.name,
-                                    rollNum: student.rollNum.toString(),
-                                    mainColor: widget.mainColor,
-                                    nis: student.nis,
-                                    nisn: student.nisn,
-                                    onTapRemove: () => _removeAlert(student),
-                                    onTapEdit: () =>
-                                        _showDialogData(student: student));
-                              });
-                        },
-                        error: (e, s) {
-                          return Center(
-                            child: textPoppins("terjadi kesalahan!",
-                                color: AppColors.black),
-                          );
-                        },
-                        loading: () => const Center(
-                          child: CircularProgressIndicator(),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              );
-            },
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.parallax,
+                  background: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 30),
+                    child: Column(
+                      children: [
+                        Center(
+                          child: textPagratiNarrow("Data Siswa",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              textAlign: TextAlign.center),
+                        ),
+                        const SizedBox(height: 50),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                textPoppins(widget.schoolClass.schClassName,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w300,
+                                    textAlign: TextAlign.left),
+                              ],
+                            ),
+                            Button(
+                              text: "Tambah Data",
+                              textColor: AppColors.black,
+                              bgColor: AppColors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              borderRadius: BorderRadius.circular(5),
+                              onPressed: () => _showDialogData(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(0.0),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: AppColors.grey,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(35),
+                            topRight: Radius.circular(35))),
+                    child: Center(
+                      child: Container(
+                        width: 70,
+                        height: 5,
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: AppColors.black.withAlpha(50),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // SliverAppBar(
+              //   pinned: true,
+              //   backgroundColor: widget.mainColor,
+              //   automaticallyImplyLeading: false,
+              //   flexibleSpace: FlexibleSpaceBar(
+              // background: Container(
+              //   decoration: const BoxDecoration(
+              //       color: AppColors.grey,
+              //       borderRadius:
+              //           BorderRadius.only(topLeft: Radius.circular(35), topRight: Radius.circular(35))),
+              //   child: Center(
+              //     child: Container(
+              //       width: 70,
+              //       height: 5,
+              //       margin: const EdgeInsets.symmetric(vertical: 16),
+              //       decoration: BoxDecoration(
+              //         color: AppColors.black.withAlpha(50),
+              //         borderRadius: BorderRadius.circular(100),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              //   ),
+              // ),
+              student.when(
+                data: (studentList) {
+                  if (studentList.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: textPoppins(
+                            "Belum ada data siswa",
+                            color: AppColors.black,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  final sortedList = [...studentList];
+
+                  sortedList.sort(
+                    (a, b) =>
+                        int.parse(a.rollNum).compareTo(int.parse(b.rollNum)),
+                  );
+
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final student = sortedList[index];
+
+                        return CardStudent(
+                          name: student.name,
+                          rollNum: student.rollNum.toString(),
+                          mainColor: widget.mainColor,
+                          nis: student.nis,
+                          nisn: student.nisn,
+                          onTapRemove: () => _removeAlert(student),
+                          onTapEdit: () => _showDialogData(student: student),
+                        );
+                      },
+                      childCount: sortedList.length,
+                    ),
+                  );
+                },
+                loading: () => const SliverToBoxAdapter(
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
+                error: (e, s) => SliverToBoxAdapter(
+                  child: Center(
+                    child: textPoppins("Terjadi kesalahan!"),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      )),
-    );
+        ));
   }
 }

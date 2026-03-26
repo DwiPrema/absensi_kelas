@@ -47,9 +47,6 @@ class SchoolClassService {
       await isar.students.deleteAll(studentIds);
 
       await isar.schoolClass.delete(id);
-
-      final count = await isar.attendances.count();
-      print("sisa attendance data : $count");
     });
   }
 }

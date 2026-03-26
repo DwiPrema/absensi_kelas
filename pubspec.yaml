@@ -58,8 +58,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - asset/image/profile.jpg
+  # assets:
+  #   - asset/image/profile.jpg
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
   # To add custom fonts to your application, add a fonts section here,

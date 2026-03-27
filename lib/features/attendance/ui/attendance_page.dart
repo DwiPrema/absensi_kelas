@@ -1,4 +1,5 @@
 import 'package:absensi_kelas/core/enums/enum.dart';
+import 'package:absensi_kelas/core/extensions/student_extension.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
 import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
@@ -97,6 +98,26 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                             ),
                           ),
                         ),
+                        Positioned(
+                          top: MediaQuery.of(context).padding.top,
+                          left: 16,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                color: AppColors.black.withAlpha(50),
+                                child: const Icon(
+                                  Icons.arrow_back,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                         studentState.when(
                           data: (studentList) {
                             final totalStudents = studentList.length;
@@ -145,9 +166,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           });
                         }
 
-                        final sortedList = [...studentList];
-                        sortedList.sort((a, b) => int.parse(a.rollNum)
-                            .compareTo(int.parse(b.rollNum)));
+                        final sortedList = studentList.sortByRollNum();
 
                         return ListView.builder(
                           shrinkWrap: true,
@@ -181,26 +200,6 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           const Center(child: CircularProgressIndicator()),
                     ),
                   ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).padding.top,
-              left: 16,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    color: AppColors.black.withAlpha(50),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: AppColors.white,
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -259,9 +258,9 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           await notifier.createData(attendance);
 
                           ref.read(attendanceUIProvider.notifier).reset();
-
+                          ref.invalidate(
+                              attendanceByClassProvider(widget.schoolClassId));
                           ref.invalidate(summaryProvider);
-                          ref.invalidate(attendanceByClassAndDateProvider);
 
                           if (!context.mounted) return;
 
@@ -366,7 +365,7 @@ void _isExistAttendance({
               Navigator.pop(dialogContext);
 
               Navigator.push(
-                buildContext, // ⬅️ ini penting!
+                buildContext,
                 MaterialPageRoute(
                   builder: (_) => ResultAttendancePage(
                     schoolClassId: schClassId,

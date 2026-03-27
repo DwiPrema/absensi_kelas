@@ -1,5 +1,6 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
+import 'package:absensi_kelas/core/extensions/student_extension.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
 import 'package:absensi_kelas/features/attendance/widget/box_absen.dart';
@@ -25,7 +26,6 @@ class ResultAttendancePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
     final dateNow = dateTime ?? DateHelper.todayOnly();
     final locale = Localizations.localeOf(context).toString();
     final String day = DateFormat('EEEE', locale).format(dateNow);
@@ -39,28 +39,25 @@ class ResultAttendancePage extends ConsumerWidget {
 
     final studentState = ref.watch(studentProviders(schoolClassId));
 
+    final paddingTopSafeArea = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(top: paddingTopSafeArea + 16),
           child: Column(
             children: [
-              const SizedBox(height: 16),
-
               textPagratiNarrow("Hasil Absensi",
                   color: AppColors.black,
                   fontSize: 24,
                   fontWeight: FontWeight.w700),
-
               const SizedBox(height: 16),
-
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: IntrinsicHeight(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// DATE CARD
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.all(16),
@@ -121,9 +118,7 @@ class ResultAttendancePage extends ConsumerWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
               summaryStatusState.when(
                   data: (data) {
                     final hadir = data[StatusKehadiran.hadir] ?? 0;
@@ -164,9 +159,7 @@ class ResultAttendancePage extends ConsumerWidget {
                   loading: () => const Center(
                         child: CircularProgressIndicator(),
                       )),
-
               const SizedBox(height: 16),
-
               attendanceState.when(
                 data: (attendance) {
                   final attendanceMap = {
@@ -178,7 +171,7 @@ class ResultAttendancePage extends ConsumerWidget {
                     data: (studentList) {
                       final filteredStudent = studentList
                           .where((e) => attendanceMap.containsKey(e.studentId))
-                          .toList();
+                          .toList().sortByRollNum();
 
                       return ListView.builder(
                         shrinkWrap: true,
@@ -206,19 +199,18 @@ class ResultAttendancePage extends ConsumerWidget {
                       child: CircularProgressIndicator(),
                     ),
                     error: (e, s) =>
-                        textPoppins("Error Siswa", color: AppColors.black),
+                        textPoppins("Data Siswa Eror", color: AppColors.black),
                   );
                 },
                 loading: () => const Center(
                   child: CircularProgressIndicator(),
                 ),
                 error: (e, s) =>
-                    textPoppins("Error absensi", color: AppColors.black),
+                    textPoppins("Data Absensi Error", color: AppColors.black),
               ),
             ],
           ),
         ),
-      ),
     );
   }
 

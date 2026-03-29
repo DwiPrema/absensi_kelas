@@ -1,5 +1,6 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
+import 'package:absensi_kelas/core/extensions/attendance_extension.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_result_page.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
@@ -98,7 +99,9 @@ class AttendanceHistoryPage extends ConsumerWidget {
                 );
               }
 
-              final uniqueDates = attendanceList
+              final sortedAttendanceList = attendanceList.sortDateTimeDes();
+
+              final uniqueDates = sortedAttendanceList
                   .map((e) => DateTime(
                       e.dateTime.year, e.dateTime.month, e.dateTime.day))
                   .toSet()

@@ -6,8 +6,9 @@ import 'package:absensi_kelas/features/attendance/ui/attendance_result_page.dart
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
-class AttendanceHistoryPage extends ConsumerWidget {
+class AttendanceHistoryPage extends ConsumerStatefulWidget {
   final String className;
   final int classId;
   final Color mainColor;
@@ -22,8 +23,20 @@ class AttendanceHistoryPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final attendance = ref.watch(attendanceByClassProvider(classId));
+  ConsumerState<AttendanceHistoryPage> createState() =>
+      _AttendanceHistoryPageState();
+}
+
+class _AttendanceHistoryPageState extends ConsumerState<AttendanceHistoryPage> {
+  DateTime selectedDate = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    final attendance = ref.watch(
+      attendanceByClassAndMonthProvider((widget.classId, selectedDate))
+    );
+
+    final locale = Localizations.localeOf(context).toString();
 
     return Scaffold(
       backgroundColor: AppColors.grey,
@@ -32,7 +45,10 @@ class AttendanceHistoryPage extends ConsumerWidget {
           SliverAppBar(
             expandedHeight: 120,
             pinned: true,
-            backgroundColor: mainColor,
+            surfaceTintColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            backgroundColor: widget.mainColor,
             leading: GestureDetector(
               onTap: () {
                 Navigator.pop(context);
@@ -56,17 +72,19 @@ class AttendanceHistoryPage extends ConsumerWidget {
               titlePadding: const EdgeInsets.all(16),
               title: Align(
                 alignment: Alignment.bottomRight,
-                child: textPoppins(className,
-                    color: AppColors.white,
-                    fontSize: 14,
-                    textAlign: TextAlign.right),
+                child: textPoppins(
+                  widget.className,
+                  color: AppColors.white,
+                  fontSize: 14,
+                  textAlign: TextAlign.right,
+                ),
               ),
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      mainColor,
-                      mainColor.withOpacity(0.7),
+                      widget.mainColor,
+                      widget.mainColor.withOpacity(0.7),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -75,10 +93,63 @@ class AttendanceHistoryPage extends ConsumerWidget {
                 padding: EdgeInsets.only(
                     top: MediaQuery.of(context).padding.top + 16),
                 alignment: Alignment.topCenter,
-                child: textPagratiNarrow("Riwayat Absensi",
-                    color: AppColors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700),
+                child: textPagratiNarrow(
+                  "Riwayat Absensi",
+                  color: AppColors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          SliverAppBar(
+            backgroundColor: widget.mainColor,
+            automaticallyImplyLeading: false,
+            toolbarHeight: 20,
+            pinned: true,
+            surfaceTintColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            flexibleSpace: SizedBox(
+              height: 60,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 12,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                itemBuilder: (context, index) {
+                  final monthDate = DateTime(DateTime.now().year, index + 1);
+                  final isSelected = monthDate.month == selectedDate.month;
+
+                  final monthName = DateFormat("MMM", locale).format(monthDate);
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedDate = monthDate;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected ? AppColors.white : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                            color: isSelected
+                                ? widget.mainColor
+                                : AppColors.white.withOpacity(0.5)),
+                      ),
+                      child: Center(
+                          child: textPoppins(monthName,
+                              color: isSelected
+                                  ? widget.mainColor
+                                  : AppColors.white,
+                              fontSize: 12)),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -112,42 +183,41 @@ class AttendanceHistoryPage extends ConsumerWidget {
                   (context, index) {
                     final date = uniqueDates[index];
                     final summaryStatus =
-                        ref.watch(summaryProvider((classId, date)));
+                        ref.watch(summaryProvider((widget.classId, date)));
 
-                    return summaryStatus.when(
-                      data: (data) {
-                        final hadir = data[StatusKehadiran.hadir] ?? 0;
-                        final izin = data[StatusKehadiran.izin] ?? 0;
-                        final sakit = data[StatusKehadiran.sakit] ?? 0;
-                        final alpha = data[StatusKehadiran.alpha] ?? 0;
-
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                          child: _attendanceCard(
-                            date: date,
-                            hadir: hadir.toString(),
-                            izin: izin.toString(),
-                            sakit: sakit.toString(),
-                            alpha: alpha.toString(),
-                            navigateToDetail: () {
-                              Navigator.push(
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: summaryStatus.when(
+                        data: (data) {
+                          final hadir = data[StatusKehadiran.hadir] ?? 0;
+                          final izin = data[StatusKehadiran.izin] ?? 0;
+                          final sakit = data[StatusKehadiran.sakit] ?? 0;
+                          final alpha = data[StatusKehadiran.alpha] ?? 0;
+                      
+                          return _attendanceCard(
+                              date: date,
+                              hadir: hadir.toString(),
+                              izin: izin.toString(),
+                              sakit: sakit.toString(),
+                              alpha: alpha.toString(),
+                              navigateToDetail: () {
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          ResultAttendancePage(
-                                            schoolClassId: classId,
-                                            schoolClassName: className,
-                                            totalStudent: totalStudent,
-                                            dateTime: date,
-                                          )));
-                            },
-                          ),
-                        );
-                      },
-                      error: (e, s) => textPoppins("Maaf terjadi kesalahan",
-                          color: AppColors.black),
-                      loading: () => const Center(
-                        child: CircularProgressIndicator(),
+                                    builder: (context) => ResultAttendancePage(
+                                      schoolClassId: widget.classId,
+                                      schoolClassName: widget.className,
+                                      totalStudent: widget.totalStudent,
+                                      dateTime: date,
+                                    ),
+                                  ),
+                                );
+                              },
+                          );
+                        },
+                        error: (e, s) => textPoppins("Maaf terjadi kesalahan",
+                            color: AppColors.black),
+                        loading: () => const SizedBox.shrink(),
                       ),
                     );
                   },
@@ -169,6 +239,9 @@ class AttendanceHistoryPage extends ConsumerWidget {
               ),
             ),
           ),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 16,),
+          )
         ],
       ),
     );

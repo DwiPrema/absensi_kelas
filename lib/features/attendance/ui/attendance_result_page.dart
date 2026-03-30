@@ -43,174 +43,209 @@ class ResultAttendancePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: paddingTopSafeArea + 16),
-          child: Column(
-            children: [
-              textPagratiNarrow("Hasil Absensi",
-                  color: AppColors.black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: const [
-                              BoxShadow(
-                                blurRadius: 6,
-                                offset: Offset(0, 3),
-                                color: Colors.black12,
-                              )
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              textPoppins("$day,",
-                                  color: AppColors.yellow,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700),
-                              textPoppins(date,
-                                  color: AppColors.yellow,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(
-                        width: 16,
-                      ),
-
-                      Expanded(
-                        child: Column(
-                          children: [
-                            _infoBox("Kelas", schoolClassName),
-                            const SizedBox(height: 10),
-                            attendanceState.when(
-                                data: (attendance) {
-                                  final attendanceDetails =
-                                      attendance?.details ?? [];
-                                  final totalHadirHariIni =
-                                      attendanceDetails.length;
-
-                                  return _infoBox(
-                                      "Total", totalHadirHariIni.toString());
-                                },
-                                error: (e, s) => _infoBox("Jumlah Siswa", "0"),
-                                loading: () => const Center(
-                                      child: CircularProgressIndicator(),
-                                    )),
-                          ],
-                        ),
-                      )
-                    ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            collapsedHeight: 300,
+            automaticallyImplyLeading: false,
+            backgroundColor: AppColors.background,
+            leading: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: Container(
+                    color: AppColors.black.withAlpha(50),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: AppColors.white,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              summaryStatusState.when(
-                  data: (data) {
-                    final hadir = data[StatusKehadiran.hadir] ?? 0;
-                    final izin = data[StatusKehadiran.izin] ?? 0;
-                    final sakit = data[StatusKehadiran.sakit] ?? 0;
-                    final alpha = data[StatusKehadiran.alpha] ?? 0;
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          _statusBox(
-                            "Hadir",
-                            hadir.toString(),
-                            AppColors.greenHadir,
+            ),
+            flexibleSpace: Column(
+              children: [
+                SizedBox(
+                  height: paddingTopSafeArea + 16,
+                ),
+                textPagratiNarrow("Hasil Absensi",
+                    color: AppColors.black,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                  color: Colors.black12,
+                                )
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                textPoppins("$day,",
+                                    color: AppColors.yellow,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700),
+                                textPoppins(date,
+                                    color: AppColors.yellow,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ],
+                            ),
                           ),
-                          _statusBox(
-                            "Izin",
-                            izin.toString(),
-                            AppColors.blueIzin,
+                        ),
+                        const SizedBox(
+                          width: 16,
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              _infoBox("Kelas", schoolClassName),
+                              const SizedBox(height: 10),
+                              attendanceState.when(
+                                  data: (attendance) {
+                                    final attendanceDetails =
+                                        attendance?.details ?? [];
+                                    final totalHadirHariIni =
+                                        attendanceDetails.length;
+
+                                    return _infoBox(
+                                        "Total", totalHadirHariIni.toString());
+                                  },
+                                  error: (e, s) =>
+                                      _infoBox("Jumlah Siswa", "0"),
+                                  loading: () => const Center(
+                                        child: CircularProgressIndicator(),
+                                      )),
+                            ],
                           ),
-                          _statusBox(
-                            "Sakit",
-                            sakit.toString(),
-                            AppColors.yellow,
-                          ),
-                          _statusBox(
-                            "Alpha",
-                            alpha.toString(),
-                            AppColors.redAlpha,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  error: (e, s) => textPoppins(
-                      "Maaf, jumlah status saat ini belum bisa ditampilkan"),
-                  loading: () => const Center(
-                        child: CircularProgressIndicator(),
-                      )),
-              const SizedBox(height: 16),
-              attendanceState.when(
-                data: (attendance) {
-                  final attendanceMap = {
-                    for (var detail in attendance?.details ?? [])
-                      detail.studentId: detail.status
-                  };
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                summaryStatusState.when(
+                    data: (data) {
+                      final hadir = data[StatusKehadiran.hadir] ?? 0;
+                      final izin = data[StatusKehadiran.izin] ?? 0;
+                      final sakit = data[StatusKehadiran.sakit] ?? 0;
+                      final alpha = data[StatusKehadiran.alpha] ?? 0;
 
-                  return studentState.when(
-                    data: (studentList) {
-                      final filteredStudent = studentList
-                          .where((e) => attendanceMap.containsKey(e.studentId))
-                          .toList().sortByRollNum();
-
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: filteredStudent.length,
-                        itemBuilder: (context, index) {
-                          final student = filteredStudent[index];
-
-                          final status = attendanceMap[student.studentId] ??
-                              StatusKehadiran.alpha;
-
-                          return BoxAbsen(
-                            nama: student.name,
-                            no: student.rollNum,
-                            mainColor: AppColors.black,
-                            nis: student.nis,
-                            nisn: student.nisn,
-                            status: status,
-                            isResultPage: true,
-                          );
-                        },
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            _statusBox(
+                              "Hadir",
+                              hadir.toString(),
+                              AppColors.greenHadir,
+                            ),
+                            _statusBox(
+                              "Izin",
+                              izin.toString(),
+                              AppColors.blueIzin,
+                            ),
+                            _statusBox(
+                              "Sakit",
+                              sakit.toString(),
+                              AppColors.yellow,
+                            ),
+                            _statusBox(
+                              "Alpha",
+                              alpha.toString(),
+                              AppColors.redAlpha,
+                            ),
+                          ],
+                        ),
                       );
                     },
+                    error: (e, s) => textPoppins(
+                        "Maaf, jumlah status saat ini belum bisa ditampilkan"),
                     loading: () => const Center(
-                      child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(),
+                        )),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+          attendanceState.when(
+            data: (attendance) {
+              final attendanceMap = {
+                for (var detail in attendance?.details ?? [])
+                  detail.studentId: detail.status
+              };
+
+              return studentState.when(
+                data: (studentList) {
+                  final filteredStudent = studentList
+                      .where((e) => attendanceMap.containsKey(e.studentId))
+                      .toList()
+                      .sortByRollNum();
+
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final student = filteredStudent[index];
+
+                        final status = attendanceMap[student.studentId] ??
+                            StatusKehadiran.alpha;
+
+                        return BoxAbsen(
+                          nama: student.name,
+                          no: student.rollNum,
+                          mainColor: AppColors.black,
+                          nis: student.nis,
+                          nisn: student.nisn,
+                          status: status,
+                          isResultPage: true,
+                        );
+                      },
+
+                      childCount: filteredStudent.length
                     ),
-                    error: (e, s) =>
-                        textPoppins("Data Siswa Eror", color: AppColors.black),
                   );
                 },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
+                loading: () => const SliverToBoxAdapter(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
-                error: (e, s) =>
-                    textPoppins("Data Absensi Error", color: AppColors.black),
+                error: (e, s) => SliverToBoxAdapter(
+                    child:
+                        textPoppins("Data Siswa Eror", color: AppColors.black)),
+              );
+            },
+            loading: () => const SliverToBoxAdapter(
+              child: Center(
+                child: CircularProgressIndicator(),
               ),
-            ],
+            ),
+            error: (e, s) => SliverToBoxAdapter(
+                child:
+                    textPoppins("Data Absensi Error", color: AppColors.black)),
           ),
-        ),
+        ],
+      ),
     );
   }
 

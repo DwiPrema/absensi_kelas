@@ -94,4 +94,21 @@ class AttendanceService {
         .classIdEqualTo(classId)
         .findAll();
   }
+
+  Future<List<Attendance>> getAttendanceByClassAndMonth({
+    required int classId,
+    required DateTime date,
+  }) async {
+    final start = DateTime(date.year, date.month, 1);
+    final end = DateTime(date.year, date.month + 1, 1);
+
+    return await DatabaseService.isarDb.attendances
+        .filter()
+        .classIdEqualTo(classId)
+        .and()
+        .dateTimeGreaterThan(start, include: true)
+        .and()
+        .dateTimeLessThan(end, include: false)
+        .findAll();
+  }
 }

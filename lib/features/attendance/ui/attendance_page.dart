@@ -258,8 +258,6 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           await notifier.createData(attendance);
 
                           ref.read(attendanceUIProvider.notifier).reset();
-                          ref.invalidate(
-                              attendanceByClassProvider(widget.schoolClassId));
                           ref.invalidate(summaryProvider);
 
                           if (!context.mounted) return;

@@ -60,9 +60,10 @@ final attendanceByClassAndDateProvider =
   },
 );
 
-final attendanceByClassProvider =
-    FutureProvider.family<List<Attendance>, int>((ref, param) async {
+final attendanceByClassAndMonthProvider =
+    FutureProvider.family<List<Attendance>, (int, DateTime)>(
+        (ref, param) async {
   final service = AttendanceService();
-  return service.getAttendanceByClass(classId: param);
+  return service.getAttendanceByClassAndMonth(
+      classId: param.$1, date: param.$2);
 });
-

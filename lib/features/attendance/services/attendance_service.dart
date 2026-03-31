@@ -111,4 +111,50 @@ class AttendanceService {
         .dateTimeLessThan(end, include: false)
         .findAll();
   }
+
+  Map<String, Map<StatusKehadiran, int>> getMonthlyRecap({
+    required List<Attendance> attendances,
+    required int month,
+    required int year,
+  }) {
+    final Map<String, Map<StatusKehadiran, int>> recap = {};
+    final filtered = attendances
+        .where((e) => e.dateTime.month == month && e.dateTime.year == year);
+
+    for (var attendance in filtered) {
+      for (var detail in attendance.details) {
+        final id = detail.studentId.toString();
+
+        if (!recap.containsKey(id)) {
+          recap[id] = {
+            StatusKehadiran.hadir: 0,
+            StatusKehadiran.izin: 0,
+            StatusKehadiran.sakit: 0,
+            StatusKehadiran.alpha: 0,
+          };
+        }
+
+        switch (detail.status) {
+          case StatusKehadiran.hadir:
+            recap[id]![StatusKehadiran.hadir] =
+                recap[id]![StatusKehadiran.hadir]! + 1;
+            break;
+          case StatusKehadiran.sakit:
+            recap[id]![StatusKehadiran.sakit] =
+                recap[id]![StatusKehadiran.sakit]! + 1;
+            break;
+          case StatusKehadiran.izin:
+            recap[id]![StatusKehadiran.izin] =
+                recap[id]![StatusKehadiran.izin]! + 1;
+            break;
+          case StatusKehadiran.alpha:
+            recap[id]![StatusKehadiran.alpha] =
+                recap[id]![StatusKehadiran.alpha]! + 1;
+            break;
+        }
+      }
+    }
+
+    return recap;
+  }
 }

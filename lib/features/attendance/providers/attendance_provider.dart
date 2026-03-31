@@ -1,3 +1,4 @@
+import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
 import 'package:absensi_kelas/features/attendance/services/attendance_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,8 +63,28 @@ final attendanceByClassAndDateProvider =
 
 final attendanceByClassAndMonthProvider =
     FutureProvider.family<List<Attendance>, (int, DateTime)>(
-        (ref, param) async {
+  (ref, param) async {
+    final service = AttendanceService();
+    return service.getAttendanceByClassAndMonth(
+        classId: param.$1, date: param.$2);
+  },
+);
+
+final attendanceMonthlyRecapProvider = FutureProvider.family<
+    Map<String, Map<StatusKehadiran, int>>, 
+    (int, DateTime)
+>((ref, param) async {
   final service = AttendanceService();
-  return service.getAttendanceByClassAndMonth(
-      classId: param.$1, date: param.$2);
+  final date = param.$2;
+
+  final data = await service.getAttendanceByClassAndMonth(
+    classId: param.$1,
+    date: date,
+  );
+
+  return service.getMonthlyRecap(
+    attendances: data,
+    month: date.month,
+    year: date.year,
+  );
 });

@@ -1,45 +1,63 @@
-# 📚 Aplikasi Absensi Kelas (Flutter + Isar)
+# 📚 Absensi Kelas App
 
-Aplikasi **Absensi Kelas** sederhana yang dibuat menggunakan **Flutter** dan **Isar Database**.
-Aplikasi ini dirancang untuk membantu pencatatan kehadiran siswa pada beberapa kelas secara cepat dan efisien.
+Aplikasi **Absensi Kelas** berbasis **Flutter** dan **Isar Database** untuk membantu pencatatan kehadiran siswa secara **cepat, ringan, dan efisien**.
 
-Project ini merupakan **rilis awal yang stabil**, dengan fokus pada implementasi fitur inti absensi.
+Project ini merupakan **rilis awal yang stabil**, dengan fokus pada implementasi fitur inti absensi yang sederhana namun powerful.
 
 ---
 
-## 🚀 Teknologi yang Digunakan
+## ✨ Preview
 
-* **Flutter**: 3.16.9
-* **State Management**: Riverpod
-* **Dart**: 3.2.6
-* **Database**: Isar
-* **Platform**: Android, iOS, Web, Desktop
+> 📸 Screenshot dan 🎥 video demo akan ditambahkan di sini
+
+---
+
+## 🚀 Tech Stack
+
+| Teknologi | Deskripsi                        |
+| --------- | -------------------------------- |
+| Flutter   | Framework UI cross-platform      |
+| Riverpod  | State management modern          |
+| Isar      | Local NoSQL database super cepat |
+| Dart      | Bahasa pemrograman utama         |
+
+---
+
+## 🎯 Fitur Utama
+
+* ✅ Input absensi siswa per kelas
+* ✅ Riwayat absensi harian
+* ✅ Rekap absensi bulanan per siswa
+* ✅ Sorting berdasarkan nomor absen
+* ✅ UI modern menggunakan Sliver
+* 🚧 (Coming Soon) Export rekap absensi
 
 ---
 
 ## 📌 Mengapa Menggunakan Flutter 3.16.9?
 
-Project ini secara sengaja menggunakan **Flutter 3.16.9** karena beberapa alasan berikut:
+Project ini menggunakan versi ini untuk menjaga stabilitas pengembangan:
 
-* ✅ **Kompatibilitas stabil dengan Isar 3.x**
-* ✅ Menghindari masalah **Android Gradle Plugin (AGP) namespace**
-* ✅ Menghindari perubahan besar pada Flutter versi terbaru
-* ✅ Menjaga konsistensi environment pengembangan
+* ✅ Kompatibel dengan **Isar 3.x**
+* ✅ Menghindari masalah Android Gradle Plugin (AGP)
+* ✅ Menghindari breaking changes pada versi terbaru
+* ✅ Lebih stabil untuk pengembangan jangka panjang
 
-> ⚠️ Pada saat pengembangan, **Isar belum sepenuhnya kompatibel dengan versi Flutter terbaru**.
-> Oleh karena itu, menggunakan **Flutter 3.16.9** memberikan pengalaman pengembangan yang lebih stabil.
+> ⚠️ Isar belum sepenuhnya kompatibel dengan Flutter versi terbaru saat project ini dibuat.
 
 ---
 
-## 🔧 Manajemen Versi Flutter (FVM)
+## 🔧 Flutter Version Management (FVM)
 
-Project ini menggunakan **FVM (Flutter Version Management)** untuk mengunci versi Flutter yang digunakan.
+Project ini menggunakan **FVM (Flutter Version Management)** untuk memastikan konsistensi versi Flutter.
 
-### Versi Flutter yang Dibutuhkan
+### 📌 Versi yang Dibutuhkan
 
-3.16.9
+```
+Flutter 3.16.9
+```
 
-Versi ini telah didefinisikan pada file:
+Versi ini dikunci pada file:
 
 ```
 .fvmrc
@@ -47,7 +65,9 @@ Versi ini telah didefinisikan pada file:
 
 ---
 
-## ⚙️ Instalasi FVM (Jika Belum Terpasang)
+## ⚙️ Instalasi FVM
+
+Jika belum memiliki FVM:
 
 ```bash
 dart pub global activate fvm
@@ -73,8 +93,52 @@ fvm flutter run
 
 ---
 
+## 📁 Struktur Project (Simplified)
+
+```
+lib/
+├── core/
+│   ├── constant/
+│   ├── database/
+│   ├── enums/
+│   ├── extensions/
+│   ├── routes/
+│   └── utils/
+│
+├── features/
+│   ├── attendance/
+│   ├── home/
+│   ├── school_classes/
+│   └── students/
+│
+├── widgets/
+└── main.dart
+```
+
+---
+
 ## 🎯 Tujuan Project
 
-Project ini dibuat sebagai bagian dari pembelajaran pengembangan aplikasi menggunakan **Flutter** serta implementasi **database lokal dengan Isar** untuk manajemen data secara efisien.
+Project ini dibuat untuk:
 
-Aplikasi ini ditujukan untuk membantu pengelolaan **absensi siswa pada jurusan RPL** secara sederhana dan terstruktur.
+* 📚 Tugas Sekolah & Media pembelajaran Flutter & Riverpod
+* 🧠 Implementasi database lokal menggunakan Isar
+* 💼 Portofolio pengembangan aplikasi mobile
+* 🚀 Memudahkan perangkat kelas / guru disekolah untuk mengabsen & merekap siswa
+
+---
+
+## ⭐ Dukungan
+
+Jika project ini membantu, jangan lupa:
+
+* ⭐ Star repository
+* 🍴 Fork project
+* 🧠 Berikan feedback
+
+---
+
+## 🔥 Future Improvements
+
+* 📊 Statistik kehadiran (chart)
+* 📤 Export data rekap absen ke PDF / Excel

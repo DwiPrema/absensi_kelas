@@ -1,6 +1,7 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AttendanceMainCard extends StatelessWidget {
   final DateTime? date;
@@ -86,10 +87,17 @@ class AttendanceMainCard extends StatelessWidget {
                               fontWeight: FontWeight.w700)),
                     ),
                     const SizedBox(width: 16,),
-                    textPoppins(studentName ?? "-",
-                        color: AppColors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
+                    Expanded(
+                      child: Text(
+                        studentName ?? "-",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: AppColors.black,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
                   ],
                 ),
           const SizedBox(height: 24),

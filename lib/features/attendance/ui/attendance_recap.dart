@@ -1,7 +1,7 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/extensions/student_extension.dart';
-import 'package:absensi_kelas/features/attendance/widget/card_recap.dart';
+import 'package:absensi_kelas/features/attendance/widget/attendance_main_card.dart';
 import 'package:absensi_kelas/features/students/models/student_model.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';

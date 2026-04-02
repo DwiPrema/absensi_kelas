@@ -3,7 +3,7 @@ import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/extensions/attendance_extension.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
-import 'package:absensi_kelas/features/attendance/widget/card_recap.dart';
+import 'package:absensi_kelas/features/attendance/widget/attendance_main_card.dart';
 import 'package:absensi_kelas/features/students/providers/student_provider.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';

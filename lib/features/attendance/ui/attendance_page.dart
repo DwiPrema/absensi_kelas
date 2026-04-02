@@ -283,6 +283,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                               "schoolClassId": widget.schoolClassId,
                               "schoolClassName": widget.schoolClassName,
                               "totalStudent": detail.length.toString(),
+                              "date": dateNow,
                             },
                           );
                         }),

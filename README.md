@@ -8,7 +8,10 @@ This project is an **initial stable release**, focusing on implementing simple y
 
 ## ✨ Preview
 
-> 📸 Screenshots and 🎥 demo videos will be added here
+<div align="left">
+  <video src="https://github.com/user-attachments/assets/8cdf9258-bbf3-4f2a-aa84-dc78d930eddc" width="320" autoplay loop muted playsinline>
+  </video>
+</div>
 
 ---
 

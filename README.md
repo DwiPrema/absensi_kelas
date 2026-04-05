@@ -144,9 +144,10 @@ This application has reached a stable stage for its core features. You can try t
 
 The development plan for the next version will focus on efficiency and smart technologies:
 
-* 🤖 **AI Assistant Integration:** Implementation of an intelligent assistant (Gemini API) for automatic recap and student attendance data analysis.
-* 🛠️ **Database Refactor:** Optimization of the database schema structure for better performance and scalability.
-* 📊 **Enhanced Analytics:** Visualization of attendance statistics in interactive charts/graphs.
+🚀 New Database Engine (Breaking Change): Migrating from Isar Database to Drift for improved scalability, structured queries, and long-term maintainability.
+
+⚠️ Note: This change is not backward-compatible. Previous local data will not be preserved.
+
 * 📤 **Export Data:** Feature to export attendance reports to PDF or Excel format.
 
 ---

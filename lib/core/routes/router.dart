@@ -1,12 +1,11 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_history.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_page.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_recap.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_result_page.dart';
-import 'package:absensi_kelas/features/school_classes/models/school_class_model.dart';
-import 'package:absensi_kelas/features/students/models/student_model.dart';
 import 'package:absensi_kelas/features/students/ui/student_page.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +17,7 @@ class AppRouter {
     switch (settings.name) {
       //Routes to Student Page
       case AppRoutes.studentPage:
-        final schoolClass = args['schoolClass'] as SchoolClass;
+        final schoolClass = args['schoolClass'] as SchoolClassesData;
         final mainColor = args['mainColor'] as Color;
 
         return MaterialPageRoute(
@@ -46,6 +45,7 @@ class AppRouter {
       case AppRoutes.attendanceResultPage:
         final date = args["date"] as DateTime;
         final schoolClassId = args['schoolClassId'] as int;
+        final attendanceId = args['attendanceId'] as int;
         final schoolClassName = args['schoolClassName'] as String;
         final totalStudents = args['totalStudent'] as String;
 
@@ -54,6 +54,7 @@ class AppRouter {
             schoolClassId: schoolClassId,
             schoolClassName: schoolClassName,
             totalStudent: totalStudents,
+            attendanceId: attendanceId,
             dateTime: date,
           ),
         );

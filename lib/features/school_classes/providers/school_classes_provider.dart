@@ -1,43 +1,42 @@
-import "package:absensi_kelas/features/school_classes/models/school_class_model.dart";
-import "package:absensi_kelas/features/school_classes/services/school_class_service.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
+import 'package:absensi_kelas/core/database/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
+import 'package:absensi_kelas/features/school_classes/services/school_class_service.dart';
 
-final schClassProvider =
-    AsyncNotifierProvider<SchClassNotifier, List<SchoolClass>>(
-        SchClassNotifier.new);
+final schoolClassProvider =
+    AsyncNotifierProvider<SchoolClassNotifier, List<SchoolClassesData>>(
+        SchoolClassNotifier.new);
 
-class SchClassNotifier extends AsyncNotifier<List<SchoolClass>> {
-  final service = SchoolClassService();
+class SchoolClassNotifier extends AsyncNotifier<List<SchoolClassesData>> {
+  late final SchoolClassService service;
 
   @override
-  Future<List<SchoolClass>> build() async {
-    return service.getAllSchClassData();
+  Future<List<SchoolClassesData>> build() async {
+    service = ref.read(schoolClassServiceProvider);
+    return service.getAllClasses();
   }
 
-  Future<void> createData(SchoolClass schClass) async {
+  Future<void> addClass(String name) async {
     state = const AsyncLoading();
-
     state = await AsyncValue.guard(() async {
-      await service.createSchClassData(schClass);
-      return service.getAllSchClassData();
+      await service.addClass(name);
+      return service.getAllClasses();
     });
   }
 
-  Future<void> deleteData(int id) async {
+  Future<void> updateClass(int id, String name) async {
     state = const AsyncLoading();
-
     state = await AsyncValue.guard(() async {
-      await service.deleteSchClassDataWithRelation(id);
-      return service.getAllSchClassData();
+      await service.updateClass(id, name);
+      return service.getAllClasses();
     });
   }
 
-  Future<void> updateData(SchoolClass schClass) async {
+  Future<void> deleteClass(int id) async {
     state = const AsyncLoading();
-
     state = await AsyncValue.guard(() async {
-      await service.updateSchClassData(schClass);
-      return service.getAllSchClassData();
+      await service.deleteClassCascade(id);
+      return service.getAllClasses();
     });
   }
 }

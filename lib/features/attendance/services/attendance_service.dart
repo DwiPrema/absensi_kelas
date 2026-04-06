@@ -1,98 +1,64 @@
-import 'package:absensi_kelas/core/database/global_service.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
-import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
-import 'package:isar/isar.dart';
+import 'package:absensi_kelas/core/extensions/attendance_status_extension.dart';
+import 'package:drift/drift.dart';
 
 class AttendanceService {
-  ///Create Attendance data
-  Future<void> createAttenData(Attendance attendance) async {
-    await DatabaseService.isarDb.writeTxn(() async {
-      await DatabaseService.isarDb.attendances.put(attendance);
-    });
-  }
+  final AppDatabase db;
 
-  ///Read Attendance Data
-  Future<List<Attendance>> getAllAttenData() async {
-    return await DatabaseService.isarDb.attendances.where().findAll();
-  }
+  AttendanceService(this.db);
 
-  ///Update Attendance Data
-  Future<void> updateAttenData(Attendance attendance) async {
-    await DatabaseService.isarDb.writeTxn(() async {
-      await DatabaseService.isarDb.attendances.put(attendance);
-    });
-  }
-
-  ///Delete Attendance Data
-  Future<void> deleteAttenData(int id) async {
-    await DatabaseService.isarDb.writeTxn(() async {
-      await DatabaseService.isarDb.attendances.delete(id);
-    });
-  }
-
-  Future<Map<StatusKehadiran, int>> getSumByStatus({
-    required int schClassId,
+  Future<int> addAttendance({
+    required int classId,
     required DateTime date,
   }) async {
-    final attendance = await DatabaseService.isarDb.attendances
-        .filter()
-        .classIdEqualTo(schClassId)
-        .and()
-        .dateTimeEqualTo(date)
-        .findFirst();
-
-    if (attendance == null) {
-      return {
-        StatusKehadiran.hadir: 0,
-        StatusKehadiran.sakit: 0,
-        StatusKehadiran.izin: 0,
-        StatusKehadiran.alpha: 0,
-      };
-    }
-
-    final result = {
-      StatusKehadiran.hadir: 0,
-      StatusKehadiran.sakit: 0,
-      StatusKehadiran.izin: 0,
-      StatusKehadiran.alpha: 0,
-    };
-
-    for (var item in attendance.details) {
-      result[item.status] = result[item.status]! + 1;
-    }
-
-    return result;
+    return await db
+        .into(db.attendances)
+        .insert(
+          AttendancesCompanion(classId: Value(classId), date: Value(date)),
+        );
   }
 
-  Future<bool> isAlreadyExist(int classId, DateTime date) async {
-    final data = await DatabaseService.isarDb.attendances
-        .filter()
-        .classIdEqualTo(classId)
-        .and()
-        .dateTimeEqualTo(date)
-        .findFirst();
+  Future<int> updateAttendance({
+    required int id,
+    int? classId,
+    DateTime? date,
+  }) async {
+    return await (db.update(
+      db.attendances,
+    )..where((t) => t.id.equals(id))).write(
+      AttendancesCompanion(
+        classId: classId != null ? Value(classId) : Value.absent(),
+        date: date != null ? Value(date) : Value.absent(),
+      ),
+    );
+  }
 
-    return data != null;
+  Future<int> deleteAttendance(int id) async {
+    return await (db.delete(
+      db.attendances,
+    )..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<void> deleteAttendanceCascade(int id) async {
+    await (db.delete(
+      db.attendanceDetails,
+    )..where((t) => t.attendanceId.equals(id))).go();
+
+    await deleteAttendance(id);
+  }
+
+  Future<List<Attendance>> getAllAttendance() async {
+    return await db.select(db.attendances).get();
   }
 
   Future<Attendance?> getAttendanceByClassAndDate({
     required int classId,
     required DateTime date,
   }) async {
-    return await DatabaseService.isarDb.attendances
-        .filter()
-        .classIdEqualTo(classId)
-        .dateTimeEqualTo(date)
-        .findFirst();
-  }
-
-  Future<List<Attendance>> getAttendanceByClass({
-    required int classId,
-  }) async {
-    return await DatabaseService.isarDb.attendances
-        .filter()
-        .classIdEqualTo(classId)
-        .findAll();
+    return await (db.select(db.attendances)
+          ..where((t) => t.classId.equals(classId) & t.date.equals(date)))
+        .getSingleOrNull();
   }
 
   Future<List<Attendance>> getAttendanceByClassAndMonth({
@@ -102,59 +68,82 @@ class AttendanceService {
     final start = DateTime(date.year, date.month, 1);
     final end = DateTime(date.year, date.month + 1, 1);
 
-    return await DatabaseService.isarDb.attendances
-        .filter()
-        .classIdEqualTo(classId)
-        .and()
-        .dateTimeGreaterThan(start, include: true)
-        .and()
-        .dateTimeLessThan(end, include: false)
-        .findAll();
+    return await (db.select(db.attendances)..where(
+          (t) => t.classId.equals(classId) & t.date.isBetweenValues(start, end),
+        ))
+        .get();
   }
 
-  Map<String, Map<StatusKehadiran, int>> getMonthlyRecap({
+  Future<Map<String, Map<StatusKehadiran, int>>> getMonthlyRecap({
     required List<Attendance> attendances,
     required int month,
     required int year,
-  }) {
+  }) async {
     final Map<String, Map<StatusKehadiran, int>> recap = {};
-    final filtered = attendances
-        .where((e) => e.dateTime.month == month && e.dateTime.year == year);
 
-    for (var attendance in filtered) {
-      for (var detail in attendance.details) {
-        final id = detail.studentId.toString();
+    for (var att in attendances) {
+      final details = await (db.select(
+        db.attendanceDetails,
+      )..where((t) => t.attendanceId.equals(att.id))).get();
 
-        if (!recap.containsKey(id)) {
-          recap[id] = {
+      for (var detail in details) {
+        recap.putIfAbsent(
+          att.classId.toString(),
+          () => {
             StatusKehadiran.hadir: 0,
-            StatusKehadiran.izin: 0,
             StatusKehadiran.sakit: 0,
+            StatusKehadiran.izin: 0,
             StatusKehadiran.alpha: 0,
-          };
-        }
+          },
+        );
 
-        switch (detail.status) {
-          case StatusKehadiran.hadir:
-            recap[id]![StatusKehadiran.hadir] =
-                recap[id]![StatusKehadiran.hadir]! + 1;
-            break;
-          case StatusKehadiran.sakit:
-            recap[id]![StatusKehadiran.sakit] =
-                recap[id]![StatusKehadiran.sakit]! + 1;
-            break;
-          case StatusKehadiran.izin:
-            recap[id]![StatusKehadiran.izin] =
-                recap[id]![StatusKehadiran.izin]! + 1;
-            break;
-          case StatusKehadiran.alpha:
-            recap[id]![StatusKehadiran.alpha] =
-                recap[id]![StatusKehadiran.alpha]! + 1;
-            break;
-        }
+        final status = StatusKehadiranExtension.fromString(detail.status);
+
+        recap[att.classId.toString()]![status] =
+            recap[att.classId.toString()]![status]! + 1;
       }
     }
 
     return recap;
+  }
+
+  Future<Map<StatusKehadiran, int>> getSumByStatus({
+    required int schClassId,
+    required DateTime date,
+  }) async {
+    final attendance =
+        await (db.select(db.attendances)..where(
+              (attendance) =>
+                  attendance.classId.equals(schClassId) &
+                  attendance.date.equals(date),
+            ))
+            .get();
+
+    final result = {
+      StatusKehadiran.hadir: 0,
+      StatusKehadiran.sakit: 0,
+      StatusKehadiran.izin: 0,
+      StatusKehadiran.alpha: 0,
+    };
+
+    for (var item in attendance) {
+      final details = await (db.select(
+        db.attendanceDetails,
+      )..where((t) => t.attendanceId.equals(item.id))).get();
+
+      for (var detail in details) {
+        final status = StatusKehadiranExtension.fromString(detail.status);
+        result[status] = result[status]! + 1;
+      }
+    }
+
+    return result;
+  }
+
+  Future<bool> isAlreadyExist(int classId, DateTime date) async {
+    final data = await (db.select(db.attendances)
+      ..where((t) => t.classId.equals(classId) & t.date.equals(date))..limit(1)).getSingleOrNull();
+
+    return data != null;
   }
 }

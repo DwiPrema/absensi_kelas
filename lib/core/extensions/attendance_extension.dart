@@ -1,9 +1,9 @@
-import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
 
 extension AttendanceListExtension on List<Attendance> {
   List<Attendance> sortDateTimeDes() {
     final sortedList = [...this];
-    sortedList.sort((a, b) => (b.dateTime).compareTo(a.dateTime));
+    sortedList.sort((a, b) => (b.date).compareTo(a.date));
 
     return sortedList;
   }

@@ -1,5 +1,4 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
-import 'package:absensi_kelas/core/database/global_service.dart';
 import 'package:absensi_kelas/core/routes/router.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await DatabaseService.setup();
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -23,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
           cursorColor: AppColors.blueCard,
-          selectionColor: AppColors.blueCard.withOpacity(0.3),
+          selectionColor: AppColors.blueCard.withValues(alpha: 0.3),
           selectionHandleColor: AppColors.blueCard,
         ),
       ),

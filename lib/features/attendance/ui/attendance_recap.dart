@@ -1,15 +1,14 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/extensions/student_extension.dart';
 import 'package:absensi_kelas/features/attendance/widget/attendance_main_card.dart';
-import 'package:absensi_kelas/features/students/models/student_model.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 
 class MonthlyStudentRecap extends StatelessWidget {
   final Map<String, Map<StatusKehadiran, int>> recap;
   final List<Student> students;
-
   final String className;
   final String month;
   final Color mainColor;
@@ -85,7 +84,7 @@ class MonthlyStudentRecap extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           mainColor,
-                          mainColor.withOpacity(0.7),
+                          mainColor.withValues(alpha: 0.7),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -111,7 +110,7 @@ class MonthlyStudentRecap extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final student = sortedStudent[index];
-                  final data = recap[student.studentId.toString()] ??
+                  final data = recap[student.id.toString()] ??
                       {
                         StatusKehadiran.hadir: 0,
                         StatusKehadiran.sakit: 0,

@@ -1,6 +1,6 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
-import 'package:absensi_kelas/features/school_classes/models/school_class_model.dart';
 import 'package:absensi_kelas/widgets/button.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class CardKelas extends StatelessWidget {
   final Color maincolor;
   final Color gradientcolor;
-  final SchoolClass schoolClass;
+  final SchoolClassesData schoolClass;
   final String jumlahsiswa;
   final Color buttoncolor;
   final VoidCallback onTapEdit;
@@ -47,7 +47,7 @@ class CardKelas extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              textPagratiNarrow(schoolClass.schClassName,
+              textPagratiNarrow(schoolClass.name,
                   fontSize: 30,
                   fontWeight: FontWeight.w700,
                   color: AppColors.black.withAlpha(200)),
@@ -74,8 +74,8 @@ class CardKelas extends StatelessWidget {
                         context,
                         AppRoutes.attendanceHistoryPage,
                         arguments: {
-                          "schoolClassId": schoolClass.schoolClassId,
-                          "schoolClassName": schoolClass.schClassName,
+                          "schoolClassId": schoolClass.id,
+                          "schoolClassName": schoolClass.name,
                           "mainColor": maincolor,
                           "totalStudent": jumlahsiswa,
                         },

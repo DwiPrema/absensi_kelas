@@ -1,52 +1,36 @@
-import 'package:absensi_kelas/core/database/global_service.dart';
-import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
-import 'package:absensi_kelas/features/school_classes/models/school_class_model.dart';
-import 'package:absensi_kelas/features/students/models/student_model.dart';
-import 'package:isar/isar.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
+import 'package:drift/drift.dart';
 
 class SchoolClassService {
-  ///Create school class data
-  Future<void> createSchClassData(SchoolClass schoolClass) async {
-    await DatabaseService.isarDb.writeTxn(() async {
-      await DatabaseService.isarDb.schoolClass.put(schoolClass);
-      await schoolClass.students.save();
-    });
+  final AppDatabase db;
+  SchoolClassService(this.db);
+
+  Future<int> addClass(String name) {
+    return db.into(db.schoolClasses).insert(
+      SchoolClassesCompanion(name: Value(name)),
+    );
   }
 
-  ///Read school class data
-  Future<List<SchoolClass>> getAllSchClassData() async {
-    final classes = await DatabaseService.isarDb.schoolClass.where().findAll();
+  Future<List<SchoolClassesData>> getAllClasses() {
+    return db.select(db.schoolClasses).get();
+  }
 
-    for (var c in classes) {
-      await c.students.load();
+  Future<int> updateClass(int id, String name) {
+    return (db.update(db.schoolClasses)..where((tbl) => tbl.id.equals(id)))
+        .write(SchoolClassesCompanion(name: Value(name)));
+  }
+
+  Future<void> deleteClassCascade(int id) async {
+    await (db.delete(db.students)..where((tbl) => tbl.classId.equals(id))).go();
+
+    final attendanceList = await (db.select(db.attendances)..where((tbl) => tbl.classId.equals(id))).get();
+
+    for (var attendance in attendanceList) {
+      await (db.delete(db.attendanceDetails)..where((tbl) => tbl.attendanceId.equals(attendance.id))).go();
     }
 
-    return classes;
-  }
+    await (db.delete(db.attendances)..where((tbl) => tbl.classId.equals(id))).go();
 
-  ///Update school class data
-  Future<void> updateSchClassData(SchoolClass schoolClass) async {
-    await DatabaseService.isarDb.writeTxn(() async {
-      await DatabaseService.isarDb.schoolClass.put(schoolClass);
-      await schoolClass.students.save();
-    });
-  }
-
-  ///Delete school class data
-  Future<void> deleteSchClassDataWithRelation(int id) async {
-    final isar = DatabaseService.isarDb;
-    await isar.writeTxn(() async {
-      await isar.attendances.filter().classIdEqualTo(id).deleteAll();
-
-      final schoolClass = await isar.schoolClass.get(id);
-      if (schoolClass == null) return;
-
-      await schoolClass.students.load();
-
-      final studentIds = schoolClass.students.map((e) => e.studentId).toList();
-      await isar.students.deleteAll(studentIds);
-
-      await isar.schoolClass.delete(id);
-    });
+    await (db.delete(db.schoolClasses)..where((tbl) => tbl.id.equals(id))).go();
   }
 }

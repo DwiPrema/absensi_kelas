@@ -1,4 +1,4 @@
-import 'package:absensi_kelas/features/students/models/student_model.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
 
 extension StudentListExtension on List<Student> {
   List<Student> sortByRollNum() {

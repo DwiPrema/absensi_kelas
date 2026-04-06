@@ -2,7 +2,7 @@ import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/extensions/student_extension.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
-import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
+import 'package:absensi_kelas/features/attendance/providers/attendance_detail_provider.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_ui_state.dart';
 import 'package:absensi_kelas/features/attendance/widget/box_absen.dart';
@@ -49,7 +49,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
 
   @override
   Widget build(BuildContext context) {
-    final studentState = ref.watch(studentProviders(widget.schoolClassId));
+    final studentState = ref.watch(studentByClass(widget.schoolClassId));
     final attendanceUiState = ref.watch(attendanceUIProvider);
 
     final dateNow = DateHelper.todayOnly();
@@ -148,7 +148,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                             );
                           },
                           loading: () => const SizedBox(),
-                          error: (_, __) => const SizedBox(),
+                          error: (_, _) => const SizedBox(),
                         ),
                       ],
                     ),
@@ -170,12 +170,15 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           _initialized = true;
 
                           WidgetsBinding.instance.addPostFrameCallback((_) {
-                            final notifier =
-                                ref.read(attendanceUIProvider.notifier);
+                            final notifier = ref.read(
+                              attendanceUIProvider.notifier,
+                            );
 
                             for (var student in studentList) {
                               notifier.updateStatus(
-                                  student.studentId, StatusKehadiran.hadir);
+                                student.id,
+                                StatusKehadiran.hadir,
+                              );
                             }
                           });
                         }
@@ -189,7 +192,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           itemBuilder: (context, index) {
                             final student = sortedList[index];
 
-                            final status = attendanceUiState[student.studentId];
+                            final status = attendanceUiState[student.id];
 
                             return BoxAbsen(
                               nama: student.name,
@@ -201,7 +204,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                               onStatusChanged: (newStatus) {
                                 ref
                                     .read(attendanceUIProvider.notifier)
-                                    .updateStatus(student.studentId, newStatus);
+                                    .updateStatus(student.id, newStatus);
                               },
                             );
                           },
@@ -231,67 +234,81 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                   right: 0,
                   child: Center(
                     child: Button(
-                        text: "Simpan",
-                        textColor: AppColors.white,
-                        bgColor: widget.headerColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        borderRadius: BorderRadius.circular(50),
-                        paddingHorizontal: 50,
-                        paddingVertical: 16,
-                        onPressed: () async {
-                          final uiState = ref.read(attendanceUIProvider);
-                          final notifier =
-                              ref.read(attendanceProvider.notifier);
+                      text: "Simpan",
+                      textColor: AppColors.white,
+                      bgColor: widget.headerColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      borderRadius: BorderRadius.circular(50),
+                      paddingHorizontal: 50,
+                      paddingVertical: 16,
+                      onPressed: () async {
+                        final uiState = ref.read(attendanceUIProvider);
 
-                          final isExist = await notifier.service
-                              .isAlreadyExist(widget.schoolClassId, dateNow);
+                        final notifier = ref.read(attendanceProvider.notifier);
+                        final detailNotifier = ref.read(
+                          attendanceDetailProvider.notifier,
+                        );
 
-                          if (!context.mounted) return;
+                        final attendanceId = await notifier.createAttendance(
+                          classId: widget.schoolClassId,
+                          date: dateNow,
+                        );
 
-                          final detail = uiState.entries.map((entry) {
-                            return AttendanceDetail()
-                              ..studentId = entry.key
-                              ..status = entry.value;
-                          }).toList();
-
-                          if (isExist) {
-                            _isExistAttendance(
-                                buildContext: context,
-                                schClassId: widget.schoolClassId,
-                                schClassName: widget.schoolClassName,
-                                totalStudent: detail.length.toString());
-                            return;
-                          }
-
-                          final attendance = Attendance()
-                            ..classId = widget.schoolClassId
-                            ..dateTime = dateNow
-                            ..details = detail;
-
-                          await notifier.createData(attendance);
-
-                          ref.read(attendanceUIProvider.notifier).reset();
-                          ref.invalidate(summaryProvider);
-
-                          if (!context.mounted) return;
-
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.attendanceResultPage,
-                            arguments: {
-                              "schoolClassId": widget.schoolClassId,
-                              "schoolClassName": widget.schoolClassName,
-                              "totalStudent": detail.length.toString(),
-                              "date": dateNow,
-                            },
+                        final detail = uiState.entries.map((entry) {
+                          return detailNotifier.addDetail(
+                            attendanceId: attendanceId,
+                            studentId: entry.key,
+                            status: entry.value,
                           );
-                        }),
+                        }).toList();
+
+                        final isExist = await notifier.service.isAlreadyExist(
+                          widget.schoolClassId,
+                          dateNow,
+                        );
+
+                        if (!context.mounted) return;
+
+                        if (isExist) {
+                          _isExistAttendance(
+                            buildContext: context,
+                            schClassId: widget.schoolClassId,
+                            attendanceId: attendanceId,
+                            schClassName: widget.schoolClassName,
+                            totalStudent: detail.length.toString(),
+                          );
+                          return;
+                        }
+
+                        await notifier.fetchAttendance(
+                          classId: widget.schoolClassId,
+                          date: dateNow,
+                        );
+
+                        ref.read(attendanceUIProvider.notifier).reset();
+                        ref.invalidate(summaryProvider);
+
+                        if (!context.mounted) return;
+
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.attendanceResultPage,
+                          arguments: {
+                            "schoolClassId": widget.schoolClassId,
+                            "attendanceId": attendanceId,
+                            "schoolClassName": widget.schoolClassName,
+                            "totalStudent": detail.length.toString(),
+                            "date": dateNow,
+                          },
+                        );
+                      },
+                    ),
                   ),
                 );
               },
               loading: () => const SizedBox(),
-              error: (_, __) => const SizedBox(),
+              error: (_, _) => const SizedBox(),
             ),
           ],
         ),
@@ -305,6 +322,7 @@ void _isExistAttendance({
   required int schClassId,
   required String schClassName,
   required String totalStudent,
+  required int attendanceId
 }) {
   showDialog(
     context: buildContext,
@@ -354,6 +372,7 @@ void _isExistAttendance({
                   "schoolClassId": schClassId,
                   "schoolClassName": schClassName,
                   "totalStudent": totalStudent,
+                  "attendanceId": attendanceId,
                   "date": DateHelper.todayOnly(),
                 },
               );

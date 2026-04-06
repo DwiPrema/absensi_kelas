@@ -1,9 +1,9 @@
+import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
 import 'package:absensi_kelas/features/home/widgets/calendar/calender.dart';
 import 'package:absensi_kelas/features/home/widgets/card/card_kelas.dart';
-import 'package:absensi_kelas/features/school_classes/models/school_class_model.dart';
 import 'package:absensi_kelas/features/school_classes/providers/school_classes_provider.dart';
 import 'package:absensi_kelas/features/students/providers/student_provider.dart';
 import 'package:absensi_kelas/widgets/button.dart';
@@ -33,8 +33,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _generateWeekDays() {
-    weekDays =
-        List.generate(5, (index) => today.add(Duration(days: index - 2)));
+    weekDays = List.generate(
+      5,
+      (index) => today.add(Duration(days: index - 2)),
+    );
   }
 
   String _getDayName(DateTime date, String locale) {
@@ -53,126 +55,138 @@ class _HomePageState extends ConsumerState<HomePage> {
     return DayType.today;
   }
 
-  void _showDialogRemove(
-      {required int id,
-      required SchoolClass schClass,
-      required String jumlahSiswa}) {
+  void _showDialogRemove({
+    required int id,
+    required SchoolClassesData schClass,
+    required String jumlahSiswa,
+  }) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.background,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: textPoppins("Yakin ingin hapus data kelas ini?",
-              color: AppColors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w700),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: textPoppins(
+            "Yakin ingin hapus data kelas ini?",
+            color: AppColors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               textPoppins(
-                  "Perhatian! : Menghapus data kelas ini akan menghapus seluruh data siswa serta absensi yang ada di dalamnya",
-                  color: AppColors.redAlpha.withAlpha(180),
-                  fontWeight: FontWeight.w700),
-              const SizedBox(
-                height: 50,
+                "Perhatian! : Menghapus data kelas ini akan menghapus seluruh data siswa serta absensi yang ada di dalamnya",
+                color: AppColors.redAlpha.withAlpha(180),
+                fontWeight: FontWeight.w700,
               ),
-              textPoppins("Kelas : ${schClass.schClassName}",
-                  fontSize: 14, color: AppColors.black),
-              const SizedBox(
-                height: 16,
+              const SizedBox(height: 50),
+              textPoppins(
+                "Kelas : ${schClass.name}",
+                fontSize: 14,
+                color: AppColors.black,
               ),
-              textPoppins("Jumlah Siswa : $jumlahSiswa",
-                  fontSize: 14, color: AppColors.black),
+              const SizedBox(height: 16),
+              textPoppins(
+                "Jumlah Siswa : $jumlahSiswa",
+                fontSize: 14,
+                color: AppColors.black,
+              ),
             ],
           ),
           actions: [
             Button(
-                text: "Batal",
-                textColor: AppColors.black,
-                bgColor: AppColors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                borderRadius: BorderRadius.circular(10),
-                onPressed: () {
-                  Navigator.pop(context);
-                }),
+              text: "Batal",
+              textColor: AppColors.black,
+              bgColor: AppColors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
             Button(
-                text: "Hapus",
-                textColor: AppColors.white,
-                bgColor: AppColors.redAlpha.withAlpha(230),
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                borderRadius: BorderRadius.circular(10),
-                onPressed: () async {
-                  final notifier = ref.read(schClassProvider.notifier);
+              text: "Hapus",
+              textColor: AppColors.white,
+              bgColor: AppColors.redAlpha.withAlpha(230),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () async {
+                final notifier = ref.read(schoolClassProvider.notifier);
 
-                  await notifier.deleteData(id);
+                await notifier.deleteClass(id);
 
-                  if (!context.mounted) return;
-                  Navigator.pop(context);
-                }),
+                if (!context.mounted) return;
+                Navigator.pop(context);
+              },
+            ),
           ],
         );
       },
     );
   }
 
-  void _showDialogData({SchoolClass? schoolClass}) {
-    final TextEditingController controller =
-        TextEditingController(text: schoolClass?.schClassName ?? "");
+  void _showDialogData({SchoolClassesData? schoolClass}) {
+    final TextEditingController controller = TextEditingController(
+      text: schoolClass?.name.toString() ?? "",
+    );
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.background,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
-              schoolClass == null ? "Tambah Data Kelas" : "Edit Data Kelas"),
+            schoolClass == null ? "Tambah Data Kelas" : "Edit Data Kelas",
+          ),
           content: textFieldWidget(
-              labelText: "Nama Kelas",
-              controller: controller,
-              textFieldType: TextFieldType.outline),
+            labelText: "Nama Kelas",
+            controller: controller,
+            textFieldType: TextFieldType.outline,
+          ),
           actions: [
             Button(
-                text: "Batal",
-                textColor: AppColors.black,
-                bgColor: AppColors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                borderRadius: BorderRadius.circular(10),
-                onPressed: () {
-                  Navigator.pop(context);
-                }),
+              text: "Batal",
+              textColor: AppColors.black,
+              bgColor: AppColors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
             Button(
-                text: schoolClass == null ? "Tambah" : "Simpan",
-                textColor: AppColors.white,
-                bgColor: AppColors.blueCard.withAlpha(230),
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                borderRadius: BorderRadius.circular(10),
-                onPressed: () async {
-                  final schClassName = controller.text.trim();
-                  if (schClassName.isEmpty) return;
+              text: schoolClass == null ? "Tambah" : "Simpan",
+              textColor: AppColors.white,
+              bgColor: AppColors.blueCard.withAlpha(230),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () async {
+                final schClassName = controller.text.trim();
+                if (schClassName.isEmpty) return;
 
-                  final notifier = ref.read(schClassProvider.notifier);
+                final notifier = ref.read(schoolClassProvider.notifier);
 
-                  if (schoolClass == null) {
-                    final newClass = SchoolClass()..schClassName = schClassName;
-                    await notifier.createData(newClass);
-                  } else {
-                    final updatedClass =
-                        schoolClass.copyWith(schClassName: schClassName);
-                    await notifier.updateData(updatedClass);
-                  }
+                if (schoolClass == null) {
+                  notifier.addClass(schClassName);
+                } else {
+                  notifier.updateClass(schoolClass.id, schClassName);
+                }
 
-                  if (!context.mounted) return;
-                  Navigator.pop(context);
-                }),
+                if (!context.mounted) return;
+                Navigator.pop(context);
+              },
+            ),
           ],
         );
       },
@@ -200,7 +214,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final schClassState = ref.watch(schClassProvider);
+    final schClassState = ref.watch(schoolClassProvider);
 
     final List<Color> mainColors = [
       AppColors.purpleCard,
@@ -228,10 +242,12 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 Center(
                   child: Container(
-                    child: textPagratiNarrow('${_getMonthName(locale)} ',
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.black),
+                    child: textPagratiNarrow(
+                      '${_getMonthName(locale)} ',
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
                 Row(
@@ -250,10 +266,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      textPagratiNarrow("Pilih Kelas",
-                          color: AppColors.black,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700),
+                      textPagratiNarrow(
+                        "Pilih Kelas",
+                        color: AppColors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
                       Button(
                         text: "+ Tambah Kelas",
                         textColor: AppColors.background,
@@ -262,7 +280,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         fontWeight: FontWeight.w700,
                         borderRadius: BorderRadius.circular(10),
                         onPressed: () => _showDialogData(),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -271,8 +289,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                   data: (schClassList) {
                     if (schClassList.isEmpty) {
                       return Center(
-                          child: textPoppins("Belum Ada Data Kelas",
-                              color: AppColors.black));
+                        child: textPoppins(
+                          "Belum Ada Data Kelas",
+                          color: AppColors.black,
+                        ),
+                      );
                     }
                     return ListView.builder(
                       shrinkWrap: true,
@@ -281,8 +302,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                       itemBuilder: (context, index) {
                         final schClass = schClassList[index];
 
-                        final student =
-                            ref.watch(studentProviders(schClass.schoolClassId));
+                        final student = ref.watch(
+                          studentByClass(schClass.id)
+                        );
                         final students = student.value ?? [];
                         final totalStudent = students.length;
 
@@ -298,19 +320,19 @@ class _HomePageState extends ConsumerState<HomePage> {
                           onTapEdit: () =>
                               _showDialogData(schoolClass: schClass),
                           onTapRemove: () => _showDialogRemove(
-                              id: schClass.schoolClassId,
-                              schClass: schClass,
-                              jumlahSiswa: totalStudent.toString()),
+                            id: schClass.id,
+                            schClass: schClass,
+                            jumlahSiswa: totalStudent.toString(),
+                          ),
                           onTapAbsen: () {
-
                             Navigator.pushNamed(
                               context,
                               AppRoutes.attendancePage,
                               arguments: {
                                 "headerColor": mainColor,
                                 "gradientColor": gradientColor,
-                                "schoolClassId": schClass.schoolClassId,
-                                "schoolClassName": schClass.schClassName,
+                                "schoolClassId": schClass.id,
+                                "schoolClassName": schClass.name,
                               },
                             );
                           },

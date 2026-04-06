@@ -1,90 +1,109 @@
+import 'package:absensi_kelas/core/database/provider.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
-import 'package:absensi_kelas/features/attendance/models/attendance_model.dart';
-import 'package:absensi_kelas/features/attendance/services/attendance_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
+import 'package:absensi_kelas/features/attendance/services/attendance_service.dart';
 
 final attendanceProvider =
     AsyncNotifierProvider<AttendanceNotifier, List<Attendance>>(
-        AttendanceNotifier.new);
+      AttendanceNotifier.new,
+    );
 
 class AttendanceNotifier extends AsyncNotifier<List<Attendance>> {
-  final service = AttendanceService();
+  late final AttendanceService service;
 
   @override
   Future<List<Attendance>> build() async {
-    return service.getAllAttenData();
+    service = ref.read(attendanceServiceProvider);
+    return service.getAllAttendance();
   }
 
-  Future<void> createData(Attendance attendance) async {
-    state = const AsyncLoading();
+  Future<int> createAttendance({
+    required int classId,
+    required DateTime date,
+  }) async {
+    return await service.addAttendance(classId: classId, date: date);
+  }
 
+  Future<void> fetchAttendance({
+    required int classId,
+    required DateTime date,
+  }) async {
+    state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await service.createAttenData(attendance);
-      return service.getAllAttenData();
+      await service.addAttendance(classId: classId, date: date);
+      return service.getAllAttendance();
     });
   }
 
-  Future<void> deleteData(int id) async {
+  Future<void> updateAttendance({
+    required int id,
+    int? classId,
+    DateTime? date,
+  }) async {
     state = const AsyncLoading();
-
     state = await AsyncValue.guard(() async {
-      await service.deleteAttenData(id);
-      return service.getAllAttenData();
+      await service.updateAttendance(id: id, classId: classId, date: date);
+      return service.getAllAttendance();
     });
   }
 
-  Future<void> updateData(Attendance attendance) async {
+  Future<void> deleteAttendance(int id) async {
     state = const AsyncLoading();
-
     state = await AsyncValue.guard(() async {
-      await service.updateAttenData(attendance);
-      return service.getAllAttenData();
+      await service.deleteAttendanceCascade(id);
+      return service.getAllAttendance();
     });
   }
 }
 
-final summaryProvider = FutureProvider.family(
-  (ref, (int schClassId, DateTime date) param) async {
-    final service = AttendanceService();
+final attendanceByClassAndMonthProvider =
+    FutureProvider.family<List<Attendance>, (int, DateTime)>((
+      ref,
+      param,
+    ) async {
+      final service = ref.watch(attendanceServiceProvider);
+      return service.getAttendanceByClassAndMonth(
+        classId: param.$1,
+        date: param.$2,
+      );
+    });
 
-    return service.getSumByStatus(schClassId: param.$1, date: param.$2);
-  },
-);
+final attendanceMonthlyRecapProvider =
+    FutureProvider.family<
+      Map<String, Map<StatusKehadiran, int>>,
+      (int, DateTime)
+    >((ref, param) async {
+      final service = ref.watch(attendanceServiceProvider);
+      final date = param.$2;
+
+      final data = await service.getAttendanceByClassAndMonth(
+        classId: param.$1,
+        date: date,
+      );
+
+      return service.getMonthlyRecap(
+        attendances: data,
+        month: date.month,
+        year: date.year,
+      );
+    });
+
+final summaryProvider = FutureProvider.family((
+  ref,
+  (int schClassId, DateTime date) param,
+) async {
+  final service = ref.watch(attendanceServiceProvider);
+
+  return service.getSumByStatus(schClassId: param.$1, date: param.$2);
+});
 
 final attendanceByClassAndDateProvider =
-    FutureProvider.family<Attendance?, (int, DateTime)>(
-  (ref, param) async {
-    final service = AttendanceService();
+    FutureProvider.family<Attendance?, (int, DateTime)>((ref, param) async {
+      final service = ref.watch(attendanceServiceProvider);
 
-    return service.getAttendanceByClassAndDate(
-        classId: param.$1, date: param.$2);
-  },
-);
-
-final attendanceByClassAndMonthProvider =
-    FutureProvider.family<List<Attendance>, (int, DateTime)>(
-  (ref, param) async {
-    final service = AttendanceService();
-    return service.getAttendanceByClassAndMonth(
-        classId: param.$1, date: param.$2);
-  },
-);
-
-final attendanceMonthlyRecapProvider = FutureProvider.family<
-    Map<String, Map<StatusKehadiran, int>>, 
-    (int, DateTime)
->((ref, param) async {
-  final service = AttendanceService();
-  final date = param.$2;
-
-  final data = await service.getAttendanceByClassAndMonth(
-    classId: param.$1,
-    date: date,
-  );
-
-  return service.getMonthlyRecap(
-    attendances: data,
-    month: date.month,
-    year: date.year,
-  );
-});
+      return service.getAttendanceByClassAndDate(
+        classId: param.$1,
+        date: param.$2,
+      );
+    });

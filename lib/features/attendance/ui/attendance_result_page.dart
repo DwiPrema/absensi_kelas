@@ -1,7 +1,9 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
+import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
-import 'package:absensi_kelas/core/extensions/student_extension.dart';
+import 'package:absensi_kelas/core/extensions/attendance_status_extension.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
+import 'package:absensi_kelas/features/attendance/providers/attendance_detail_provider.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
 import 'package:absensi_kelas/features/attendance/widget/box_absen.dart';
 import 'package:absensi_kelas/features/students/providers/student_provider.dart';
@@ -16,12 +18,14 @@ class ResultAttendancePage extends ConsumerWidget {
   final String schoolClassName;
   final String totalStudent;
   final DateTime? dateTime;
+  final int attendanceId;
 
   const ResultAttendancePage({
     super.key,
     required this.schoolClassId,
     required this.schoolClassName,
     required this.totalStudent,
+    required this.attendanceId,
     this.dateTime,
   });
 
@@ -32,13 +36,15 @@ class ResultAttendancePage extends ConsumerWidget {
     final String day = DateFormat('EEEE', locale).format(dateNow);
     final String date = DateFormat('dd MMMM yyyy', locale).format(dateNow);
 
-    final summaryStatusState =
-        ref.watch(summaryProvider((schoolClassId, dateNow)));
+    final summaryStatusState = ref.watch(
+      summaryProvider((schoolClassId, dateNow)),
+    );
 
-    final attendanceState =
-        ref.watch(attendanceByClassAndDateProvider((schoolClassId, dateNow)));
+    final attendanceDetail = ref.watch(
+      attendanceWithStudentProvider(attendanceId),
+    );
 
-    final studentState = ref.watch(studentProviders(schoolClassId));
+    final studentState = ref.watch(studentByClass(schoolClassId));
 
     final paddingTopSafeArea = MediaQuery.of(context).padding.top;
 
@@ -61,23 +67,20 @@ class ResultAttendancePage extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(100),
                   child: Container(
                     color: AppColors.black.withAlpha(50),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: AppColors.white,
-                    ),
+                    child: const Icon(Icons.arrow_back, color: AppColors.white),
                   ),
                 ),
               ),
             ),
             flexibleSpace: Column(
               children: [
-                SizedBox(
-                  height: paddingTopSafeArea + 16,
+                SizedBox(height: paddingTopSafeArea + 16),
+                textPagratiNarrow(
+                  "Hasil Absensi",
+                  color: AppColors.black,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
                 ),
-                textPagratiNarrow("Hasil Absensi",
-                    color: AppColors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -96,27 +99,29 @@ class ResultAttendancePage extends ConsumerWidget {
                                   blurRadius: 6,
                                   offset: Offset(0, 3),
                                   color: Colors.black12,
-                                )
+                                ),
                               ],
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                textPoppins("$day,",
-                                    color: AppColors.yellow,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700),
-                                textPoppins(date,
-                                    color: AppColors.yellow,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500),
+                                textPoppins(
+                                  "$day,",
+                                  color: AppColors.yellow,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                textPoppins(
+                                  date,
+                                  color: AppColors.yellow,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ],
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          width: 16,
-                        ),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             children: [
@@ -126,111 +131,117 @@ class ResultAttendancePage extends ConsumerWidget {
                                 color: AppColors.yellow,
                               ),
                               const SizedBox(height: 10),
-                              attendanceState.when(
-                                  data: (attendance) {
-                                    final attendanceDetails =
-                                        attendance?.details ?? [];
-                                    final totalHadirHariIni =
-                                        attendanceDetails.length;
-                                        
-                                    return BoxInfo(
-                                      label: "Total",
-                                      value: totalHadirHariIni.toString(),
-                                      color: AppColors.yellow,
-                                    );
-                                  },
-                                  error: (e, s) =>
-                                      const BoxInfo(label: "Jumlah Siswa", value: "0", color: AppColors.yellow),
-                                  loading: () => const Center(
-                                        child: CircularProgressIndicator(),
-                                      )),
+                              studentState.when(
+                                data: (studentList) {
+                                  final totalStudent = studentList.length;
+
+                                  return BoxInfo(
+                                    label: "Total",
+                                    value: totalStudent.toString(),
+                                    color: AppColors.yellow,
+                                  );
+                                },
+                                error: (e, s) => const BoxInfo(
+                                  label: "Jumlah Siswa",
+                                  value: "0",
+                                  color: AppColors.yellow,
+                                ),
+                                loading: () => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 summaryStatusState.when(
-                    data: (data) {
-                      final hadir = data[StatusKehadiran.hadir] ?? 0;
-                      final izin = data[StatusKehadiran.izin] ?? 0;
-                      final sakit = data[StatusKehadiran.sakit] ?? 0;
-                      final alpha = data[StatusKehadiran.alpha] ?? 0;
+                  data: (data) {
+                    final hadir = data[StatusKehadiran.hadir] ?? 0;
+                    final izin = data[StatusKehadiran.izin] ?? 0;
+                    final sakit = data[StatusKehadiran.sakit] ?? 0;
+                    final alpha = data[StatusKehadiran.alpha] ?? 0;
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            Expanded(child: BoxInfo(label: "Hadir", value: hadir.toString(), color: AppColors.greenHadir)),
-                            Expanded(child: BoxInfo(label: "Izin", value: izin.toString(), color: AppColors.blueIzin)),
-                            Expanded(child: BoxInfo(label: "Sakit", value: sakit.toString(), color: AppColors.yellow)),
-                            Expanded(child: BoxInfo(label: "Alpha", value: alpha.toString(), color: AppColors.redAlpha)),
-                          ],
-                        ),
-                      );
-                    },
-                    error: (e, s) => textPoppins(
-                        "Maaf, jumlah status saat ini belum bisa ditampilkan"),
-                    loading: () => const Center(
-                          child: CircularProgressIndicator(),
-                        )),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: BoxInfo(
+                              label: "Hadir",
+                              value: hadir.toString(),
+                              color: AppColors.greenHadir,
+                            ),
+                          ),
+                          Expanded(
+                            child: BoxInfo(
+                              label: "Izin",
+                              value: izin.toString(),
+                              color: AppColors.blueIzin,
+                            ),
+                          ),
+                          Expanded(
+                            child: BoxInfo(
+                              label: "Sakit",
+                              value: sakit.toString(),
+                              color: AppColors.yellow,
+                            ),
+                          ),
+                          Expanded(
+                            child: BoxInfo(
+                              label: "Alpha",
+                              value: alpha.toString(),
+                              color: AppColors.redAlpha,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  error: (e, s) => textPoppins(
+                    "Maaf, jumlah status saat ini belum bisa ditampilkan",
+                  ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                ),
                 const SizedBox(height: 16),
               ],
             ),
           ),
-          attendanceState.when(
-            data: (attendance) {
-              final attendanceMap = {
-                for (var detail in attendance?.details ?? [])
-                  detail.studentId: detail.status
-              };
+          attendanceDetail.when(
+            data: (attendances) {
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final item = attendances[index];
 
-              return studentState.when(
-                data: (studentList) {
-                  final filteredStudent = studentList
-                      .where((e) => attendanceMap.containsKey(e.studentId))
-                      .toList()
-                      .sortByRollNum();
+                  final detail = item['attendanceDetail'] as AttendanceDetail;
+                  final student = item['student'] as Student;
 
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final student = filteredStudent[index];
-
-                      final status = attendanceMap[student.studentId] ??
-                          StatusKehadiran.alpha;
-
-                      return BoxAbsen(
-                        nama: student.name,
-                        no: student.rollNum,
-                        mainColor: AppColors.black,
-                        nis: student.nis,
-                        nisn: student.nisn,
-                        status: status,
-                        isResultPage: true,
-                      );
-                    }, childCount: filteredStudent.length),
+                  final status = StatusKehadiranExtension.fromString(
+                    detail.status,
                   );
-                },
-                loading: () => const SliverToBoxAdapter(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-                error: (e, s) => SliverToBoxAdapter(
-                    child:
-                        textPoppins("Data Siswa Eror", color: AppColors.black)),
+
+                  return BoxAbsen(
+                    nama: student.name,
+                    no: student.rollNum,
+                    nis: student.nis,
+                    nisn: student.nisn,
+                    status: status,
+                    mainColor: AppColors.black,
+                    isResultPage: true,
+                  );
+                }, childCount: attendances.length),
               );
             },
             loading: () => const SliverToBoxAdapter(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             ),
             error: (e, s) => SliverToBoxAdapter(
-                child:
-                    textPoppins("Data Absensi Error", color: AppColors.black)),
+              child: textPoppins("Data Absensi Error", color: AppColors.black),
+            ),
           ),
         ],
       ),

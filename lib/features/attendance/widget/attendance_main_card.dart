@@ -36,7 +36,7 @@ class AttendanceMainCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withOpacity(0.2),
+            color: AppColors.black.withValues(alpha: 0.2),
             blurRadius: 5,
             offset: const Offset(0, 3),
           ),
@@ -76,7 +76,7 @@ class AttendanceMainCard extends StatelessWidget {
                       width: 25,
                       height: 25,
                       decoration: BoxDecoration(
-                        color: mainColor?.withOpacity(0.8) ?? AppColors.grey,
+                        color: mainColor?.withValues(alpha: 0.8) ?? AppColors.grey,
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Center(

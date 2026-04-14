@@ -7,7 +7,7 @@ import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 
 class MonthlyStudentRecap extends StatelessWidget {
-  final Map<String, Map<StatusKehadiran, int>> recap;
+  final Map<int, Map<StatusKehadiran, int>> recap;
   final List<Student> students;
   final String className;
   final String month;
@@ -27,6 +27,7 @@ class MonthlyStudentRecap extends StatelessWidget {
     final sortedStudent = students.sortByRollNum();
 
     return Scaffold(
+      backgroundColor: AppColors.grey,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -110,7 +111,7 @@ class MonthlyStudentRecap extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final student = sortedStudent[index];
-                  final data = recap[student.id.toString()] ??
+                  final data = recap[student.id] ??
                       {
                         StatusKehadiran.hadir: 0,
                         StatusKehadiran.sakit: 0,

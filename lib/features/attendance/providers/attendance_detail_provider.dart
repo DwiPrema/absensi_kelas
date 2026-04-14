@@ -6,7 +6,8 @@ import 'package:absensi_kelas/features/attendance/services/attendance_detail_ser
 
 final attendanceDetailProvider =
     AsyncNotifierProvider<AttendanceDetailNotifier, List<AttendanceDetail>>(
-        AttendanceDetailNotifier.new);
+      AttendanceDetailNotifier.new,
+    );
 
 class AttendanceDetailNotifier extends AsyncNotifier<List<AttendanceDetail>> {
   late final AttendanceDetailService service;
@@ -22,12 +23,11 @@ class AttendanceDetailNotifier extends AsyncNotifier<List<AttendanceDetail>> {
     required int studentId,
     required StatusKehadiran status,
   }) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await service.addAttendanceDetail(
-          attendanceId: attendanceId, studentId: studentId, status: status);
-      return service.getAllAttendanceDetail();
-    });
+    await service.addAttendanceDetail(
+      attendanceId: attendanceId,
+      studentId: studentId,
+      status: status,
+    );
   }
 
   Future<void> deleteDetail(int id) async {
@@ -40,8 +40,11 @@ class AttendanceDetailNotifier extends AsyncNotifier<List<AttendanceDetail>> {
 }
 
 final attendanceWithStudentProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, int>((ref, attendanceId) async {
-  final db = ref.watch(attendanceDetailServiceProvider);
+    FutureProvider.family<List<Map<String, dynamic>>, int>((
+      ref,
+      attendanceId,
+    ) async {
+      final db = ref.watch(attendanceDetailServiceProvider);
 
-  return await db.getAttendanceWithStudent(attendanceId);
-});
+      return await db.getAttendanceWithStudent(attendanceId);
+    });

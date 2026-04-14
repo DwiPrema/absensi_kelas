@@ -56,9 +56,13 @@ class AttendanceService {
     required int classId,
     required DateTime date,
   }) async {
-    return await (db.select(db.attendances)
-          ..where((t) => t.classId.equals(classId) & t.date.equals(date)))
-        .getSingleOrNull();
+    final result = await (db.select(
+      db.attendances,
+    )..where((t) => t.classId.equals(classId) & t.date.equals(date))).get();
+
+    if (result.isEmpty) return null;
+
+    return result.first;
   }
 
   Future<List<Attendance>> getAttendanceByClassAndMonth({
@@ -74,12 +78,12 @@ class AttendanceService {
         .get();
   }
 
-  Future<Map<String, Map<StatusKehadiran, int>>> getMonthlyRecap({
+  Future<Map<int, Map<StatusKehadiran, int>>> getMonthlyRecap({
     required List<Attendance> attendances,
     required int month,
     required int year,
   }) async {
-    final Map<String, Map<StatusKehadiran, int>> recap = {};
+    final Map<int, Map<StatusKehadiran, int>> recap = {};
 
     for (var att in attendances) {
       final details = await (db.select(
@@ -87,8 +91,10 @@ class AttendanceService {
       )..where((t) => t.attendanceId.equals(att.id))).get();
 
       for (var detail in details) {
+        final studentId = detail.studentId;
+
         recap.putIfAbsent(
-          att.classId.toString(),
+          studentId,
           () => {
             StatusKehadiran.hadir: 0,
             StatusKehadiran.sakit: 0,
@@ -99,8 +105,7 @@ class AttendanceService {
 
         final status = StatusKehadiranExtension.fromString(detail.status);
 
-        recap[att.classId.toString()]![status] =
-            recap[att.classId.toString()]![status]! + 1;
+        recap[studentId]![status] = recap[studentId]![status]! + 1;
       }
     }
 
@@ -141,8 +146,11 @@ class AttendanceService {
   }
 
   Future<bool> isAlreadyExist(int classId, DateTime date) async {
-    final data = await (db.select(db.attendances)
-      ..where((t) => t.classId.equals(classId) & t.date.equals(date))..limit(1)).getSingleOrNull();
+    final data =
+        await (db.select(db.attendances)
+              ..where((t) => t.classId.equals(classId) & t.date.equals(date))
+              ..limit(1))
+            .getSingleOrNull();
 
     return data != null;
   }

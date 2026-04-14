@@ -55,6 +55,19 @@ class AttendanceNotifier extends AsyncNotifier<List<Attendance>> {
       return service.getAllAttendance();
     });
   }
+
+  Future<Attendance?> getAttendanceByDate(int classId, DateTime date) async {
+    try {
+      final attendance = await service.getAttendanceByClassAndDate(
+        classId: classId,
+        date: date,
+      );
+      return attendance;
+    } catch (e) {
+      print("Error getAttendanceByDate: $e");
+      return null;
+    }
+  }
 }
 
 final attendanceByClassAndMonthProvider =
@@ -71,7 +84,7 @@ final attendanceByClassAndMonthProvider =
 
 final attendanceMonthlyRecapProvider =
     FutureProvider.family<
-      Map<String, Map<StatusKehadiran, int>>,
+      Map<int, Map<StatusKehadiran, int>>,
       (int, DateTime)
     >((ref, param) async {
       final service = ref.watch(attendanceServiceProvider);

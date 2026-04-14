@@ -2,6 +2,7 @@ import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/extensions/attendance_extension.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
+import 'package:absensi_kelas/core/utils/date_helper.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
 import 'package:absensi_kelas/features/attendance/widget/attendance_main_card.dart';
 import 'package:absensi_kelas/features/students/providers/student_provider.dart';
@@ -31,7 +32,7 @@ class AttendanceHistoryPage extends ConsumerStatefulWidget {
 }
 
 class _AttendanceHistoryPageState extends ConsumerState<AttendanceHistoryPage> {
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateHelper.todayOnly();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class _AttendanceHistoryPageState extends ConsumerState<AttendanceHistoryPage> {
       attendanceByClassAndMonthProvider((widget.classId, selectedDate)),
     );
 
-    final students = ref.watch(studentProvider);
+    final students = ref.watch(studentByClass(widget.classId));
 
     final recap = ref.watch(
       attendanceMonthlyRecapProvider((widget.classId, selectedDate)),
@@ -124,7 +125,6 @@ class _AttendanceHistoryPageState extends ConsumerState<AttendanceHistoryPage> {
                     ),
                   ),
 
-                  //validasi button rekap absen
                   attendance.when(
                     data: (data) {
                       if (data.isEmpty) return const SizedBox.shrink();
@@ -273,6 +273,8 @@ class _AttendanceHistoryPageState extends ConsumerState<AttendanceHistoryPage> {
                     summaryProvider((widget.classId, date)),
                   );
 
+                  final attendanceId = attendanceList[index].id;
+
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                     child: summaryStatus.when(
@@ -294,6 +296,7 @@ class _AttendanceHistoryPageState extends ConsumerState<AttendanceHistoryPage> {
                               AppRoutes.attendanceResultPage,
                               arguments: {
                                 "schoolClassId": widget.classId,
+                                "attendanceId": attendanceId,
                                 "schoolClassName": widget.className,
                                 "totalStudent": widget.totalStudent,
                                 "date": date,

@@ -77,7 +77,7 @@ class AppRouter {
 
       //Routes to Attendance Recap Page
       case AppRoutes.attendanceRecapPage:
-        final recap = args['recap'] as Map<String, Map<StatusKehadiran, int>>;
+        final recap = args['recap'] as Map<int, Map<StatusKehadiran, int>>;
         final students = args['students'] as List<Student>;
         final month = args['month'] as String;
         final schoolClassName = args['schoolClassName'] as String;

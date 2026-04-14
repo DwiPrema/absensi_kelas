@@ -244,47 +244,40 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                       paddingVertical: 16,
                       onPressed: () async {
                         final uiState = ref.read(attendanceUIProvider);
-
                         final notifier = ref.read(attendanceProvider.notifier);
                         final detailNotifier = ref.read(
                           attendanceDetailProvider.notifier,
                         );
+
+                        final existingAttendance = await notifier
+                            .getAttendanceByDate(widget.schoolClassId, dateNow);
+
+                        if (!context.mounted) return;
+
+                        if (existingAttendance != null) {
+                          _isExistAttendance(
+                            buildContext: context,
+                            schClassId: widget.schoolClassId,
+                            schClassName: widget.schoolClassName,
+                            totalStudent: uiState.entries.length.toString(),
+                            attendanceId:
+                                existingAttendance.id, // ✅ aman (tidak null)
+                          );
+                          return;
+                        }
 
                         final attendanceId = await notifier.createAttendance(
                           classId: widget.schoolClassId,
                           date: dateNow,
                         );
 
-                        final detail = uiState.entries.map((entry) {
-                          return detailNotifier.addDetail(
+                        for (final entry in uiState.entries) {
+                          await detailNotifier.addDetail(
                             attendanceId: attendanceId,
                             studentId: entry.key,
                             status: entry.value,
                           );
-                        }).toList();
-
-                        final isExist = await notifier.service.isAlreadyExist(
-                          widget.schoolClassId,
-                          dateNow,
-                        );
-
-                        if (!context.mounted) return;
-
-                        if (isExist) {
-                          _isExistAttendance(
-                            buildContext: context,
-                            schClassId: widget.schoolClassId,
-                            attendanceId: attendanceId,
-                            schClassName: widget.schoolClassName,
-                            totalStudent: detail.length.toString(),
-                          );
-                          return;
                         }
-
-                        await notifier.fetchAttendance(
-                          classId: widget.schoolClassId,
-                          date: dateNow,
-                        );
 
                         ref.read(attendanceUIProvider.notifier).reset();
                         ref.invalidate(summaryProvider);
@@ -296,9 +289,9 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           AppRoutes.attendanceResultPage,
                           arguments: {
                             "schoolClassId": widget.schoolClassId,
-                            "attendanceId": attendanceId,
                             "schoolClassName": widget.schoolClassName,
-                            "totalStudent": detail.length.toString(),
+                            "totalStudent": uiState.entries.length.toString(),
+                            "attendanceId": attendanceId,
                             "date": dateNow,
                           },
                         );
@@ -322,7 +315,7 @@ void _isExistAttendance({
   required int schClassId,
   required String schClassName,
   required String totalStudent,
-  required int attendanceId
+  required int attendanceId,
 }) {
   showDialog(
     context: buildContext,
@@ -364,7 +357,7 @@ void _isExistAttendance({
             borderRadius: BorderRadius.circular(10),
             onPressed: () {
               Navigator.pop(dialogContext);
-
+              
               Navigator.pushNamed(
                 buildContext,
                 AppRoutes.attendanceResultPage,
@@ -373,7 +366,7 @@ void _isExistAttendance({
                   "schoolClassName": schClassName,
                   "totalStudent": totalStudent,
                   "attendanceId": attendanceId,
-                  "date": DateHelper.todayOnly(),
+                  "date" : DateHelper.todayOnly(),
                 },
               );
             },

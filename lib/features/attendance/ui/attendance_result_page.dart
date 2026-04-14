@@ -213,9 +213,18 @@ class ResultAttendancePage extends ConsumerWidget {
           ),
           attendanceDetail.when(
             data: (attendances) {
+              final sortedAttendances = [...attendances];
+
+              sortedAttendances.sort((a, b) {
+                final studentA = a['student'] as Student;
+                final studentB = b['student'] as Student;
+
+                return studentA.rollNum.compareTo(studentB.rollNum);
+              });
+
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final item = attendances[index];
+                  final item = sortedAttendances[index];
 
                   final detail = item['attendanceDetail'] as AttendanceDetail;
                   final student = item['student'] as Student;
@@ -233,7 +242,7 @@ class ResultAttendancePage extends ConsumerWidget {
                     mainColor: AppColors.black,
                     isResultPage: true,
                   );
-                }, childCount: attendances.length),
+                }, childCount: sortedAttendances.length),
               );
             },
             loading: () => const SliverToBoxAdapter(

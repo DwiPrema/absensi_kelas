@@ -261,7 +261,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                             schClassName: widget.schoolClassName,
                             totalStudent: uiState.entries.length.toString(),
                             attendanceId:
-                                existingAttendance.id, // ✅ aman (tidak null)
+                                existingAttendance.id,
                           );
                           return;
                         }
@@ -279,7 +279,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           );
                         }
 
-                        ref.read(attendanceUIProvider.notifier).reset();
+                        ref.watch(attendanceUIProvider.notifier).reset();
                         ref.invalidate(summaryProvider);
 
                         if (!context.mounted) return;

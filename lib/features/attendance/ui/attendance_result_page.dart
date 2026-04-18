@@ -6,7 +6,6 @@ import 'package:absensi_kelas/core/utils/date_helper.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_detail_provider.dart';
 import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
 import 'package:absensi_kelas/features/attendance/widget/box_absen.dart';
-import 'package:absensi_kelas/features/students/providers/student_provider.dart';
 import 'package:absensi_kelas/widgets/box.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -43,8 +42,6 @@ class ResultAttendancePage extends ConsumerWidget {
     final attendanceDetail = ref.watch(
       attendanceWithStudentProvider(attendanceId),
     );
-
-    final studentState = ref.watch(studentByClass(schoolClassId));
 
     final paddingTopSafeArea = MediaQuery.of(context).padding.top;
 
@@ -131,7 +128,7 @@ class ResultAttendancePage extends ConsumerWidget {
                                 color: AppColors.yellow,
                               ),
                               const SizedBox(height: 10),
-                              studentState.when(
+                              attendanceDetail.when(
                                 data: (studentList) {
                                   final totalStudent = studentList.length;
 

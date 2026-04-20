@@ -1,5 +1,5 @@
 import 'package:absensi_kelas/core/enums/enum.dart';
-import 'package:absensi_kelas/features/home/widgets/calendar/calender_style.dart';
+import 'package:absensi_kelas/features/home/widgets/calendar/calendar_style.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 

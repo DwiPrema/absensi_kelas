@@ -251,178 +251,181 @@ class _StudentPageState extends ConsumerState<StudentPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.grey,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(
-          decelerationRate: ScrollDecelerationRate.fast,
-        ),
-        slivers: [
-          SliverAppBar(
-            elevation: 0.0,
-            backgroundColor: widget.mainColor,
-            expandedHeight: 250,
-            collapsedHeight: 95,
-            pinned: true,
-            automaticallyImplyLeading: false,
-            leading: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: Container(
-                    color: AppColors.black.withAlpha(50),
-                    child: const Icon(Icons.arrow_back, color: AppColors.white),
+      body: SafeArea(
+        top: false,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(
+            decelerationRate: ScrollDecelerationRate.fast,
+          ),
+          slivers: [
+            SliverAppBar(
+              elevation: 0.0,
+              backgroundColor: widget.mainColor,
+              expandedHeight: 250,
+              collapsedHeight: 95,
+              pinned: true,
+              automaticallyImplyLeading: false,
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
+                      color: AppColors.black.withAlpha(50),
+                      child: const Icon(Icons.arrow_back, color: AppColors.white),
+                    ),
                   ),
                 ),
               ),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.parallax,
-              background: Container(
-                padding: EdgeInsets.fromLTRB(
-                  16,
-                  paddingTopSafeArea + 24,
-                  16,
-                  16,
-                ),
-                child: Column(
-                  children: [
-                    Center(
-                      child: textPagratiNarrow(
-                        "Data Siswa",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        textAlign: TextAlign.center,
+              flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.parallax,
+                background: Container(
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    paddingTopSafeArea + 24,
+                    16,
+                    16,
+                  ),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: textPagratiNarrow(
+                          "Data Siswa",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            textPoppins(
-                              widget.schoolClass.name,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w300,
-                              textAlign: TextAlign.left,
-                            ),
-                            student.when(
-                              data: (data) {
-                                final totalStudent = data.length.toString();
-
-                                return textPoppins(
-                                  "$totalStudent siswa",
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              textPoppins(
+                                widget.schoolClass.name,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w300,
+                                textAlign: TextAlign.left,
+                              ),
+                              student.when(
+                                data: (data) {
+                                  final totalStudent = data.length.toString();
+        
+                                  return textPoppins(
+                                    "$totalStudent siswa",
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    textAlign: TextAlign.left,
+                                  );
+                                },
+                                error: (e, s) => textPoppins(
+                                  "-",
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   textAlign: TextAlign.left,
-                                );
-                              },
-                              error: (e, s) => textPoppins(
-                                "-",
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                textAlign: TextAlign.left,
+                                ),
+                                loading: () => textPoppins(
+                                  "-",
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  textAlign: TextAlign.left,
+                                ),
                               ),
-                              loading: () => textPoppins(
-                                "-",
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Button(
-                          text: "Tambah Data",
-                          textColor: AppColors.black,
-                          bgColor: AppColors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          borderRadius: BorderRadius.circular(5),
-                          onPressed: () => _showDialogData(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(0.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.grey,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(35),
-                    topRight: Radius.circular(35),
-                  ),
-                ),
-                child: Center(
-                  child: Container(
-                    width: 70,
-                    height: 5,
-                    margin: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.black.withAlpha(50),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
+                            ],
+                          ),
+                          Button(
+                            text: "Tambah Data",
+                            textColor: AppColors.black,
+                            bgColor: AppColors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            borderRadius: BorderRadius.circular(5),
+                            onPressed: () => _showDialogData(),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ),
-          student.when(
-            data: (studentList) {
-              if (studentList.isEmpty) {
-                return SliverToBoxAdapter(
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(0.0),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.grey,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(35),
+                      topRight: Radius.circular(35),
+                    ),
+                  ),
                   child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: textPoppins(
-                        "Belum ada data siswa",
-                        color: AppColors.black,
-                        fontSize: 12,
+                    child: Container(
+                      width: 70,
+                      height: 5,
+                      margin: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: AppColors.black.withAlpha(50),
+                        borderRadius: BorderRadius.circular(100),
                       ),
                     ),
                   ),
-                );
-              }
-
-              final sortedList = studentList.sortByRollNum();
-
-              return SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final student = sortedList[index];
-
-                  return CardStudent(
-                    name: student.name,
-                    rollNum: student.rollNum.toString(),
-                    mainColor: widget.mainColor,
-                    nis: student.nis,
-                    nisn: student.nisn,
-                    onTapRemove: () => _removeAlert(student),
-                    onTapEdit: () => _showDialogData(student: student),
-                  );
-                }, childCount: sortedList.length),
-              );
-            },
-            loading: () => const SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: CircularProgressIndicator(),
                 ),
               ),
             ),
-            error: (e, s) => SliverToBoxAdapter(
-              child: Center(child: textPoppins("Terjadi kesalahan!")),
+            student.when(
+              data: (studentList) {
+                if (studentList.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: textPoppins(
+                          "Belum ada data siswa",
+                          color: AppColors.black,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+        
+                final sortedList = studentList.sortByRollNum();
+        
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final student = sortedList[index];
+        
+                    return CardStudent(
+                      name: student.name,
+                      rollNum: student.rollNum.toString(),
+                      mainColor: widget.mainColor,
+                      nis: student.nis,
+                      nisn: student.nisn,
+                      onTapRemove: () => _removeAlert(student),
+                      onTapEdit: () => _showDialogData(student: student),
+                    );
+                  }, childCount: sortedList.length),
+                );
+              },
+              loading: () => const SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+              error: (e, s) => SliverToBoxAdapter(
+                child: Center(child: textPoppins("Terjadi kesalahan!")),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,8 +1,7 @@
 import 'package:absensi_kelas/core/database/app_database.dart';
-import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
-import 'package:absensi_kelas/features/home/widgets/calendar/calender.dart';
+import 'package:absensi_kelas/features/home/widgets/calendar/calendar.dart';
 import 'package:absensi_kelas/features/home/widgets/card/card_kelas.dart';
 import 'package:absensi_kelas/features/school_classes/providers/school_classes_provider.dart';
 import 'package:absensi_kelas/features/students/providers/student_provider.dart';
@@ -11,7 +10,6 @@ import 'package:absensi_kelas/widgets/text_field_widget.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../../../core/constant/app_colors.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -38,23 +36,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       (index) => today.add(Duration(days: index - 2)),
     );
   }
-
-  String _getDayName(DateTime date, String locale) {
-    return DateFormat('EEE', locale).format(date).toString();
-  }
-
-  String _getMonthName(String locale) {
-    return DateFormat('MMMM', locale).format(DateTime.now());
-  }
-
-  DayType _getDayType(DateTime date) {
-    final todayDate = DateHelper.todayOnly();
-    final compareDate = DateTime(date.year, date.month, date.day);
-    if (compareDate.isBefore(todayDate)) return DayType.past;
-    if (compareDate.isAfter(todayDate)) return DayType.future;
-    return DayType.today;
-  }
-
+  
   void _showDialogRemove({
     required int id,
     required SchoolClassesData schClass,
@@ -207,8 +189,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       cardHeight: height,
       dayNameFontSize: nameSize,
       dateFontSize: dateSize,
-      getDayType: _getDayType,
-      getDayName: (date) => _getDayName(date, locale),
+      getDayType: DateHelper.getDayType,
+      getDayName: (date) => DateHelper.getDayName(date, locale),
     );
   }
 
@@ -243,7 +225,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 Center(
                   child: Container(
                     child: textPagratiNarrow(
-                      '${_getMonthName(locale)} ',
+                      '${DateHelper.getMonthName(locale)} ',
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
                       color: AppColors.black,

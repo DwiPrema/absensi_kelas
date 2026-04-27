@@ -20,6 +20,7 @@ class StudentNotifier extends AsyncNotifier<List<Student>> {
     required String name,
     required String rollNum,
     required int classId,
+    required String gender,
     String nis = '-',
     String nisn = '-',
   }) async {
@@ -29,6 +30,7 @@ class StudentNotifier extends AsyncNotifier<List<Student>> {
         name: name,
         rollNum: rollNum,
         classId: classId,
+        gender: gender,
         nis: nis,
         nisn: nisn,
       );
@@ -40,6 +42,7 @@ class StudentNotifier extends AsyncNotifier<List<Student>> {
     required int id,
     String? name,
     String? rollNum,
+    String? gender,
     String? nis,
     String? nisn,
     int? classId,
@@ -50,6 +53,7 @@ class StudentNotifier extends AsyncNotifier<List<Student>> {
         id: id,
         name: name,
         rollNum: rollNum,
+        gender: gender,
         nis: nis,
         nisn: nisn,
         classId: classId,

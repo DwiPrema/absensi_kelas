@@ -23,6 +23,7 @@ class Students extends Table {
   TextColumn get rollNum => text()();
   TextColumn get nis => text().withDefault(const Constant('-'))();
   TextColumn get nisn => text().withDefault(const Constant('-'))();
+  TextColumn get gender => text()();
   IntColumn get classId => integer()(); // relasi ke SchoolClass
 }
 
@@ -42,19 +43,14 @@ class AttendanceDetails extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get attendanceId => integer()(); // relasi ke Attendance
   IntColumn get studentId => integer()(); // relasi ke Student
-  TextColumn get status => text()(); // 'Hadir', 'Alfa', 'Izin'
+  TextColumn get status => text()();
 }
 
 /// ============================
 /// DATABASE
 /// ============================
 @DriftDatabase(
-  tables: [
-    SchoolClasses,
-    Students,
-    Attendances,
-    AttendanceDetails,
-  ],
+  tables: [SchoolClasses, Students, Attendances, AttendanceDetails],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

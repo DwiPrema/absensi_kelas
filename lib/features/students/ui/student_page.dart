@@ -1,5 +1,6 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/core/database/app_database.dart';
+import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/extensions/student_extension.dart';
 import 'package:absensi_kelas/features/students/providers/student_provider.dart';
 import 'package:absensi_kelas/features/students/widgets/card_student.dart';
@@ -8,6 +9,7 @@ import 'package:absensi_kelas/widgets/text_field_widget.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class StudentPage extends ConsumerStatefulWidget {
   final Color mainColor;
@@ -49,117 +51,168 @@ class _StudentPageState extends ConsumerState<StudentPage> {
       text: student?.nisn,
     );
 
+    Gender? selectedGender = student?.gender.toGender();
+
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.background,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Text(
-            student == null ? "Tambah Data Siswa" : "Edit Data Siswa",
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 16),
-                textFieldWidget(
-                  labelText: "Nama Siswa",
-                  controller: nameController,
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: AppColors.background,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Text(
+                student == null ? "Tambah Data Siswa" : "Edit Data Siswa",
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 16),
+                    textFieldWidget(
+                      labelText: "Nama Siswa",
+                      controller: nameController,
+                    ),
+                    const SizedBox(height: 16),
+                    textFieldWidget(
+                      labelText: "No Absen",
+                      controller: rollNumController,
+                      maxLength: 2,
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<Gender>(
+                      dropdownColor: AppColors.white,
+                      initialValue: selectedGender,
+                      decoration: InputDecoration(
+                        labelText: 'Gender',
+                        labelStyle: GoogleFonts.poppins(
+                          color: AppColors.black.withAlpha(100),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                        ),
+                        border: const UnderlineInputBorder(),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey, width: 1.5),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: AppColors.blueCard.withAlpha(100),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      items: Gender.values.map((gender) {
+                        return DropdownMenuItem<Gender>(
+                          value: gender,
+                          child: textPoppins(
+                            gender.value,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            color: AppColors.black,
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          selectedGender = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    textFieldWidget(
+                      labelText: "NIS (Opsional)",
+                      controller: nisController,
+                      maxLength: 10,
+                    ),
+                    const SizedBox(height: 16),
+                    textFieldWidget(
+                      labelText: "NISN (Opsional)",
+                      controller: nisnController,
+                      maxLength: 15,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                textFieldWidget(
-                  labelText: "No Absen",
-                  controller: rollNumController,
-                  maxLength: 2,
+              ),
+              actions: [
+                Button(
+                  text: "Batal",
+                  textColor: AppColors.black,
+                  bgColor: AppColors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  borderRadius: BorderRadius.circular(10),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 ),
-                const SizedBox(height: 16),
-                textFieldWidget(
-                  labelText: "NIS (Opsional)",
-                  controller: nisController,
-                  maxLength: 10,
-                ),
-                const SizedBox(height: 16),
-                textFieldWidget(
-                  labelText: "NISN (Opsional)",
-                  controller: nisnController,
-                  maxLength: 15,
+                Button(
+                  text: student == null ? "Tambah" : "Simpan",
+                  textColor: AppColors.white,
+                  bgColor: AppColors.blueCard.withAlpha(230),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  borderRadius: BorderRadius.circular(10),
+                  onPressed: () async {
+                    FocusScope.of(context).unfocus();
+                    final studentName = nameController.text.trim();
+                    final rollNum = rollNumController.text.trim();
+                    final nis = nisController.text.trim();
+                    final nisn = nisnController.text.trim();
+
+                    if (studentName.isEmpty) {
+                      _showError("Nama siswa wajib diisi");
+                      return;
+                    }
+
+                    if (rollNum.isEmpty) {
+                      _showError("Nomor absen wajib diisi");
+                      return;
+                    }
+
+                    if (int.tryParse(rollNum) == null) {
+                      _showError("Nomor absen harus berupa angka");
+                      return;
+                    }
+
+                    if (selectedGender == null) {
+                      _showError("Gender wajib dipilih");
+                      return;
+                    }
+
+                    final notifier = ref.read(studentProvider.notifier);
+
+                    if (student == null) {
+                      await notifier.addStudent(
+                        name: studentName,
+                        rollNum: rollNum,
+                        gender: selectedGender!.value,
+                        classId: widget.schoolClass.id,
+                        nis: nis.isEmpty ? "-" : nis,
+                        nisn: nisn.isEmpty ? "-" : nisn,
+                      );
+                    } else {
+                      await notifier.updateStudent(
+                        id: student.id,
+                        name: studentName,
+                        rollNum: rollNum,
+                        gender: selectedGender!.value,
+                        nis: nis.isEmpty ? "-" : nis,
+                        nisn: nisn.isEmpty ? "-" : nisn,
+                      );
+                    }
+
+                    ref.invalidate(studentByClass(widget.schoolClass.id));
+
+                    if (!context.mounted) return;
+
+                    Navigator.pop(context);
+                  },
                 ),
               ],
-            ),
-          ),
-          actions: [
-            Button(
-              text: "Batal",
-              textColor: AppColors.black,
-              bgColor: AppColors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              borderRadius: BorderRadius.circular(10),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            Button(
-              text: student == null ? "Tambah" : "Simpan",
-              textColor: AppColors.white,
-              bgColor: AppColors.blueCard.withAlpha(230),
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              borderRadius: BorderRadius.circular(10),
-              onPressed: () async {
-                FocusScope.of(context).unfocus();
-                final studentName = nameController.text.trim();
-                final rollNum = rollNumController.text.trim();
-                final nis = nisController.text.trim();
-                final nisn = nisnController.text.trim();
-
-                if (studentName.isEmpty) {
-                  _showError("Nama siswa wajib diisi");
-                  return;
-                }
-
-                if (rollNum.isEmpty) {
-                  _showError("Nomor absen wajib diisi");
-                  return;
-                }
-
-                if (int.tryParse(rollNum) == null) {
-                  _showError("Nomor absen harus berupa angka");
-                  return;
-                }
-
-                final notifier = ref.watch(studentProvider.notifier);
-
-                if (student == null) {
-
-                  await notifier.addStudent(
-                    name: studentName,
-                    rollNum: rollNum,
-                    classId: widget.schoolClass.id,
-                    nis: nis.isEmpty ? "-" : nis,
-                    nisn: nisn.isEmpty ? "-" : nisn,
-                  );
-                } else {
-                  await notifier.updateStudent(
-                    id: student.id,
-                    name: studentName,
-                    rollNum: rollNum,
-                    nis: nis.isEmpty ? "-" : nis,
-                    nisn: nisn.isEmpty ? "-" : nisn,
-                  );
-                }
-
-                ref.invalidate(studentByClass(widget.schoolClass.id));
-
-                if (!context.mounted) return;
-
-                Navigator.pop(context);
-              },
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -230,7 +283,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
 
                 await notifier.deleteStudent(student.id);
 
-                ref.invalidate(studentByClass(widget.schoolClass.id)); 
+                ref.invalidate(studentByClass(widget.schoolClass.id));
 
                 if (!context.mounted) return;
                 Navigator.pop(context);
@@ -275,7 +328,10 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                     borderRadius: BorderRadius.circular(100),
                     child: Container(
                       color: AppColors.black.withAlpha(50),
-                      child: const Icon(Icons.arrow_back, color: AppColors.white),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: AppColors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -315,7 +371,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                               student.when(
                                 data: (data) {
                                   final totalStudent = data.length.toString();
-        
+
                                   return textPoppins(
                                     "$totalStudent siswa",
                                     fontSize: 12,
@@ -393,16 +449,17 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                     ),
                   );
                 }
-        
+
                 final sortedList = studentList.sortByRollNum();
-        
+
                 return SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final student = sortedList[index];
-        
+
                     return CardStudent(
                       name: student.name,
                       rollNum: student.rollNum.toString(),
+                      gender: student.gender,
                       mainColor: widget.mainColor,
                       nis: student.nis,
                       nisn: student.nisn,

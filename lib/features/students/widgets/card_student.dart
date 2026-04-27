@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 class CardStudent extends StatelessWidget {
   final String name;
   final String rollNum;
+  final String gender;
   final String? nis;
   final String? nisn;
   final Color mainColor;
@@ -16,6 +17,7 @@ class CardStudent extends StatelessWidget {
     super.key,
     required this.name,
     required this.rollNum,
+    required this.gender,
     required this.nis,
     required this.nisn,
     required this.mainColor,
@@ -30,16 +32,17 @@ class CardStudent extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       width: double.infinity,
       decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withAlpha(40),
-              blurRadius: 2,
-              spreadRadius: 2,
-              offset: const Offset(0, 3),
-            ),
-          ]),
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withAlpha(40),
+            blurRadius: 2,
+            spreadRadius: 2,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Column(
         children: [
           Row(
@@ -54,15 +57,16 @@ class CardStudent extends StatelessWidget {
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Center(
-                    child: textPoppins(rollNum,
-                        color: AppColors.white,
-                        fontSize: 12,
-                        textAlign: TextAlign.center,
-                        fontWeight: FontWeight.w700)),
+                  child: textPoppins(
+                    rollNum,
+                    color: AppColors.white,
+                    fontSize: 12,
+                    textAlign: TextAlign.center,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,13 +76,19 @@ class CardStudent extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: AppColors.black,
-                          fontWeight: FontWeight.w800),
+                        fontSize: 14,
+                        color: AppColors.black,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 16,
+                    const SizedBox(height: 16),
+                    textPoppins(
+                      gender,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.black,
                     ),
+                    const SizedBox(height: 16),
                     RichText(
                       text: TextSpan(
                         children: [
@@ -104,9 +114,7 @@ class CardStudent extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(
-                width: 16,
-              ),
+              const SizedBox(width: 16),
               Row(
                 children: [
                   GestureDetector(
@@ -117,9 +125,7 @@ class CardStudent extends StatelessWidget {
                       color: AppColors.black,
                     ),
                   ),
-                  const SizedBox(
-                    width: 8,
-                  ),
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: onTapEdit,
                     child: const Icon(
@@ -127,9 +133,9 @@ class CardStudent extends StatelessWidget {
                       size: 22,
                       color: AppColors.black,
                     ),
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ],

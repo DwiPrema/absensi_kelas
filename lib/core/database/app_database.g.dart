@@ -251,6 +251,15 @@ class $StudentsTable extends Students with TableInfo<$StudentsTable, Student> {
     requiredDuringInsert: false,
     defaultValue: const Constant('-'),
   );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _classIdMeta = const VerificationMeta(
     'classId',
   );
@@ -263,7 +272,15 @@ class $StudentsTable extends Students with TableInfo<$StudentsTable, Student> {
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, name, rollNum, nis, nisn, classId];
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    rollNum,
+    nis,
+    nisn,
+    gender,
+    classId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -307,6 +324,14 @@ class $StudentsTable extends Students with TableInfo<$StudentsTable, Student> {
         nisn.isAcceptableOrUnknown(data['nisn']!, _nisnMeta),
       );
     }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_genderMeta);
+    }
     if (data.containsKey('class_id')) {
       context.handle(
         _classIdMeta,
@@ -344,6 +369,10 @@ class $StudentsTable extends Students with TableInfo<$StudentsTable, Student> {
         DriftSqlType.string,
         data['${effectivePrefix}nisn'],
       )!,
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      )!,
       classId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}class_id'],
@@ -363,6 +392,7 @@ class Student extends DataClass implements Insertable<Student> {
   final String rollNum;
   final String nis;
   final String nisn;
+  final String gender;
   final int classId;
   const Student({
     required this.id,
@@ -370,6 +400,7 @@ class Student extends DataClass implements Insertable<Student> {
     required this.rollNum,
     required this.nis,
     required this.nisn,
+    required this.gender,
     required this.classId,
   });
   @override
@@ -380,6 +411,7 @@ class Student extends DataClass implements Insertable<Student> {
     map['roll_num'] = Variable<String>(rollNum);
     map['nis'] = Variable<String>(nis);
     map['nisn'] = Variable<String>(nisn);
+    map['gender'] = Variable<String>(gender);
     map['class_id'] = Variable<int>(classId);
     return map;
   }
@@ -391,6 +423,7 @@ class Student extends DataClass implements Insertable<Student> {
       rollNum: Value(rollNum),
       nis: Value(nis),
       nisn: Value(nisn),
+      gender: Value(gender),
       classId: Value(classId),
     );
   }
@@ -406,6 +439,7 @@ class Student extends DataClass implements Insertable<Student> {
       rollNum: serializer.fromJson<String>(json['rollNum']),
       nis: serializer.fromJson<String>(json['nis']),
       nisn: serializer.fromJson<String>(json['nisn']),
+      gender: serializer.fromJson<String>(json['gender']),
       classId: serializer.fromJson<int>(json['classId']),
     );
   }
@@ -418,6 +452,7 @@ class Student extends DataClass implements Insertable<Student> {
       'rollNum': serializer.toJson<String>(rollNum),
       'nis': serializer.toJson<String>(nis),
       'nisn': serializer.toJson<String>(nisn),
+      'gender': serializer.toJson<String>(gender),
       'classId': serializer.toJson<int>(classId),
     };
   }
@@ -428,6 +463,7 @@ class Student extends DataClass implements Insertable<Student> {
     String? rollNum,
     String? nis,
     String? nisn,
+    String? gender,
     int? classId,
   }) => Student(
     id: id ?? this.id,
@@ -435,6 +471,7 @@ class Student extends DataClass implements Insertable<Student> {
     rollNum: rollNum ?? this.rollNum,
     nis: nis ?? this.nis,
     nisn: nisn ?? this.nisn,
+    gender: gender ?? this.gender,
     classId: classId ?? this.classId,
   );
   Student copyWithCompanion(StudentsCompanion data) {
@@ -444,6 +481,7 @@ class Student extends DataClass implements Insertable<Student> {
       rollNum: data.rollNum.present ? data.rollNum.value : this.rollNum,
       nis: data.nis.present ? data.nis.value : this.nis,
       nisn: data.nisn.present ? data.nisn.value : this.nisn,
+      gender: data.gender.present ? data.gender.value : this.gender,
       classId: data.classId.present ? data.classId.value : this.classId,
     );
   }
@@ -456,13 +494,15 @@ class Student extends DataClass implements Insertable<Student> {
           ..write('rollNum: $rollNum, ')
           ..write('nis: $nis, ')
           ..write('nisn: $nisn, ')
+          ..write('gender: $gender, ')
           ..write('classId: $classId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, rollNum, nis, nisn, classId);
+  int get hashCode =>
+      Object.hash(id, name, rollNum, nis, nisn, gender, classId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -472,6 +512,7 @@ class Student extends DataClass implements Insertable<Student> {
           other.rollNum == this.rollNum &&
           other.nis == this.nis &&
           other.nisn == this.nisn &&
+          other.gender == this.gender &&
           other.classId == this.classId);
 }
 
@@ -481,6 +522,7 @@ class StudentsCompanion extends UpdateCompanion<Student> {
   final Value<String> rollNum;
   final Value<String> nis;
   final Value<String> nisn;
+  final Value<String> gender;
   final Value<int> classId;
   const StudentsCompanion({
     this.id = const Value.absent(),
@@ -488,6 +530,7 @@ class StudentsCompanion extends UpdateCompanion<Student> {
     this.rollNum = const Value.absent(),
     this.nis = const Value.absent(),
     this.nisn = const Value.absent(),
+    this.gender = const Value.absent(),
     this.classId = const Value.absent(),
   });
   StudentsCompanion.insert({
@@ -496,9 +539,11 @@ class StudentsCompanion extends UpdateCompanion<Student> {
     required String rollNum,
     this.nis = const Value.absent(),
     this.nisn = const Value.absent(),
+    required String gender,
     required int classId,
   }) : name = Value(name),
        rollNum = Value(rollNum),
+       gender = Value(gender),
        classId = Value(classId);
   static Insertable<Student> custom({
     Expression<int>? id,
@@ -506,6 +551,7 @@ class StudentsCompanion extends UpdateCompanion<Student> {
     Expression<String>? rollNum,
     Expression<String>? nis,
     Expression<String>? nisn,
+    Expression<String>? gender,
     Expression<int>? classId,
   }) {
     return RawValuesInsertable({
@@ -514,6 +560,7 @@ class StudentsCompanion extends UpdateCompanion<Student> {
       if (rollNum != null) 'roll_num': rollNum,
       if (nis != null) 'nis': nis,
       if (nisn != null) 'nisn': nisn,
+      if (gender != null) 'gender': gender,
       if (classId != null) 'class_id': classId,
     });
   }
@@ -524,6 +571,7 @@ class StudentsCompanion extends UpdateCompanion<Student> {
     Value<String>? rollNum,
     Value<String>? nis,
     Value<String>? nisn,
+    Value<String>? gender,
     Value<int>? classId,
   }) {
     return StudentsCompanion(
@@ -532,6 +580,7 @@ class StudentsCompanion extends UpdateCompanion<Student> {
       rollNum: rollNum ?? this.rollNum,
       nis: nis ?? this.nis,
       nisn: nisn ?? this.nisn,
+      gender: gender ?? this.gender,
       classId: classId ?? this.classId,
     );
   }
@@ -554,6 +603,9 @@ class StudentsCompanion extends UpdateCompanion<Student> {
     if (nisn.present) {
       map['nisn'] = Variable<String>(nisn.value);
     }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
     if (classId.present) {
       map['class_id'] = Variable<int>(classId.value);
     }
@@ -568,6 +620,7 @@ class StudentsCompanion extends UpdateCompanion<Student> {
           ..write('rollNum: $rollNum, ')
           ..write('nis: $nis, ')
           ..write('nisn: $nisn, ')
+          ..write('gender: $gender, ')
           ..write('classId: $classId')
           ..write(')'))
         .toString();
@@ -1280,6 +1333,7 @@ typedef $$StudentsTableCreateCompanionBuilder =
       required String rollNum,
       Value<String> nis,
       Value<String> nisn,
+      required String gender,
       required int classId,
     });
 typedef $$StudentsTableUpdateCompanionBuilder =
@@ -1289,6 +1343,7 @@ typedef $$StudentsTableUpdateCompanionBuilder =
       Value<String> rollNum,
       Value<String> nis,
       Value<String> nisn,
+      Value<String> gender,
       Value<int> classId,
     });
 
@@ -1323,6 +1378,11 @@ class $$StudentsTableFilterComposer
 
   ColumnFilters<String> get nisn => $composableBuilder(
     column: $table.nisn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1366,6 +1426,11 @@ class $$StudentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get classId => $composableBuilder(
     column: $table.classId,
     builder: (column) => ColumnOrderings(column),
@@ -1395,6 +1460,9 @@ class $$StudentsTableAnnotationComposer
 
   GeneratedColumn<String> get nisn =>
       $composableBuilder(column: $table.nisn, builder: (column) => column);
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
 
   GeneratedColumn<int> get classId =>
       $composableBuilder(column: $table.classId, builder: (column) => column);
@@ -1433,6 +1501,7 @@ class $$StudentsTableTableManager
                 Value<String> rollNum = const Value.absent(),
                 Value<String> nis = const Value.absent(),
                 Value<String> nisn = const Value.absent(),
+                Value<String> gender = const Value.absent(),
                 Value<int> classId = const Value.absent(),
               }) => StudentsCompanion(
                 id: id,
@@ -1440,6 +1509,7 @@ class $$StudentsTableTableManager
                 rollNum: rollNum,
                 nis: nis,
                 nisn: nisn,
+                gender: gender,
                 classId: classId,
               ),
           createCompanionCallback:
@@ -1449,6 +1519,7 @@ class $$StudentsTableTableManager
                 required String rollNum,
                 Value<String> nis = const Value.absent(),
                 Value<String> nisn = const Value.absent(),
+                required String gender,
                 required int classId,
               }) => StudentsCompanion.insert(
                 id: id,
@@ -1456,6 +1527,7 @@ class $$StudentsTableTableManager
                 rollNum: rollNum,
                 nis: nis,
                 nisn: nisn,
+                gender: gender,
                 classId: classId,
               ),
           withReferenceMapper: (p0) => p0

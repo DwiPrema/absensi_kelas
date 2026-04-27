@@ -251,6 +251,13 @@ class _StudentPageState extends ConsumerState<StudentPage> {
               ),
               const SizedBox(height: 16),
               textPoppins(
+                "Gender : ${student.gender}",
+                fontSize: 14,
+                color: AppColors.black,
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 16),
+              textPoppins(
                 "NIS/NISN : ${student.nis} / ${student.nisn}",
                 fontSize: 14,
                 color: AppColors.black,

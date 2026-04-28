@@ -1,6 +1,7 @@
 import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
+import 'package:absensi_kelas/features/attendance/ui/attendance_export.dart';
 import 'package:absensi_kelas/features/home/widgets/calendar/calendar.dart';
 import 'package:absensi_kelas/features/home/widgets/card/card_kelas.dart';
 import 'package:absensi_kelas/features/school_classes/providers/school_classes_provider.dart';
@@ -36,7 +37,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       (index) => today.add(Duration(days: index - 2)),
     );
   }
-  
+
   void _showDialogRemove({
     required int id,
     required SchoolClassesData schClass,
@@ -216,120 +217,171 @@ class _HomePageState extends ConsumerState<HomePage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    child: textPagratiNarrow(
-                      '${DateHelper.getMonthName(locale)} ',
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.black,
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildCalendarCard(0, 50, 105, 13, 17, locale),
-                    _buildCalendarCard(1, 60, 130, 15, 22, locale),
-                    _buildCalendarCard(2, 80, 160, 17, 29, locale),
-                    _buildCalendarCard(3, 60, 130, 15, 22, locale),
-                    _buildCalendarCard(4, 50, 105, 13, 17, locale),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      textPagratiNarrow(
-                        "Pilih Kelas",
+                    Center(
+                      child: textPagratiNarrow(
+                        '${DateHelper.getMonthName(locale)} ',
+                        fontSize: 32,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
                       ),
-                      Button(
-                        text: "+ Tambah Kelas",
-                        textColor: AppColors.background,
-                        bgColor: AppColors.blueCard,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        borderRadius: BorderRadius.circular(10),
-                        onPressed: () => _showDialogData(),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                schClassState.when(
-                  data: (schClassList) {
-                    if (schClassList.isEmpty) {
-                      return Center(
-                        child: textPoppins(
-                          "Belum Ada Data Kelas",
-                          color: AppColors.black,
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: schClassList.length,
-                      itemBuilder: (context, index) {
-                        final schClass = schClassList[index];
+                    ),
 
-                        final student = ref.watch(
-                          studentByClass(schClass.id)
-                        );
-                        final students = student.value ?? [];
-                        final totalStudent = students.length;
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildCalendarCard(0, 50, 105, 13, 17, locale),
+                        _buildCalendarCard(1, 60, 130, 15, 22, locale),
+                        _buildCalendarCard(2, 80, 160, 17, 29, locale),
+                        _buildCalendarCard(3, 60, 130, 15, 22, locale),
+                        _buildCalendarCard(4, 50, 105, 13, 17, locale),
+                      ],
+                    ),
 
-                        final mainColor = mainColors[index % mainColors.length];
-                        final gradientColor =
-                            gradientColors[index % gradientColors.length];
-                        return CardKelas(
-                          maincolor: mainColor,
-                          gradientcolor: gradientColor,
-                          schoolClass: schClass,
-                          jumlahsiswa: totalStudent.toString(),
-                          buttoncolor: AppColors.background,
-                          onTapEdit: () =>
-                              _showDialogData(schoolClass: schClass),
-                          onTapRemove: () => _showDialogRemove(
-                            id: schClass.id,
-                            schClass: schClass,
-                            jumlahSiswa: totalStudent.toString(),
+                    const SizedBox(height: 32),
+
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          textPagratiNarrow(
+                            "Pilih Kelas",
+                            color: AppColors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
                           ),
-                          onTapAbsen: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.attendancePage,
-                              arguments: {
-                                "headerColor": mainColor,
-                                "gradientColor": gradientColor,
-                                "schoolClassId": schClass.id,
-                                "schoolClassName": schClass.name,
+                          Button(
+                            text: "+ Tambah Kelas",
+                            textColor: AppColors.background,
+                            bgColor: AppColors.blueCard,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            borderRadius: BorderRadius.circular(10),
+                            onPressed: () => _showDialogData(),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    schClassState.when(
+                      data: (schClassList) {
+                        if (schClassList.isEmpty) {
+                          return Center(
+                            child: textPoppins(
+                              "Belum Ada Data Kelas",
+                              color: AppColors.black,
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: schClassList.length,
+                          itemBuilder: (context, index) {
+                            final schClass = schClassList[index];
+
+                            final student = ref.watch(
+                              studentByClass(schClass.id),
+                            );
+
+                            final students = student.value ?? [];
+                            final totalStudent = students.length;
+
+                            final mainColor =
+                                mainColors[index % mainColors.length];
+
+                            final gradientColor =
+                                gradientColors[index % gradientColors.length];
+
+                            return CardKelas(
+                              maincolor: mainColor,
+                              gradientcolor: gradientColor,
+                              schoolClass: schClass,
+                              jumlahsiswa: totalStudent.toString(),
+                              buttoncolor: AppColors.background,
+                              onTapEdit: () =>
+                                  _showDialogData(schoolClass: schClass),
+                              onTapRemove: () => _showDialogRemove(
+                                id: schClass.id,
+                                schClass: schClass,
+                                jumlahSiswa: totalStudent.toString(),
+                              ),
+                              onTapAbsen: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.attendancePage,
+                                  arguments: {
+                                    "headerColor": mainColor,
+                                    "gradientColor": gradientColor,
+                                    "schoolClassId": schClass.id,
+                                    "schoolClassName": schClass.name,
+                                  },
+                                );
                               },
                             );
                           },
                         );
                       },
+                      error: (error, stack) => Center(
+                        child: textPoppins("Terjadi kesalahan: $error"),
+                      ),
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ExportHistoryPage(),
+                      ),
                     );
                   },
-                  error: (error, stack) =>
-                      Center(child: textPoppins("Terjadi kesalahan: $error")),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(20),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.history,
+                      color: AppColors.blueCard,
+                      size: 24,
+                    ),
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

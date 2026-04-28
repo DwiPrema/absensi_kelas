@@ -2,6 +2,7 @@ import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
+import 'package:absensi_kelas/features/attendance/ui/attendance_export.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_history.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_page.dart';
 import 'package:absensi_kelas/features/attendance/ui/attendance_recap.dart';
@@ -93,16 +94,17 @@ class AppRouter {
           ),
         );
 
+      //Routes to Export History Page
+      case AppRoutes.exportHistoryPage:
+        return MaterialPageRoute(builder: (_) => ExportHistoryPage());
+
       //Default Routes (Page Not Found)
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
             backgroundColor: AppColors.background,
             body: Center(
-              child: textPoppins(
-                "Page Not Found",
-                color: AppColors.black,
-              ),
+              child: textPoppins("Page Not Found", color: AppColors.black),
             ),
           ),
         );

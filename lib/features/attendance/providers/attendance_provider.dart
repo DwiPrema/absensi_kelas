@@ -64,7 +64,6 @@ class AttendanceNotifier extends AsyncNotifier<List<Attendance>> {
       );
       return attendance;
     } catch (e) {
-      print("Error getAttendanceByDate: $e");
       return null;
     }
   }

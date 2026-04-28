@@ -1,7 +1,6 @@
 import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/routes/routes.dart';
 import 'package:absensi_kelas/core/utils/date_helper.dart';
-import 'package:absensi_kelas/features/attendance/ui/attendance_export.dart';
 import 'package:absensi_kelas/features/home/widgets/calendar/calendar.dart';
 import 'package:absensi_kelas/features/home/widgets/card/card_kelas.dart';
 import 'package:absensi_kelas/features/school_classes/providers/school_classes_provider.dart';
@@ -352,12 +351,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(14),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ExportHistoryPage(),
-                      ),
-                    );
+                    Navigator.pushNamed(context, AppRoutes.exportHistoryPage);
                   },
                   child: Container(
                     padding: const EdgeInsets.all(10),

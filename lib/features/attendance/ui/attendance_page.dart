@@ -343,7 +343,7 @@ void _isExistAttendance({
           Button(
             text: "Batal",
             textColor: AppColors.black,
-            bgColor: AppColors.background,
+            bgColor: AppColors.white,
             fontSize: 10,
             fontWeight: FontWeight.w600,
             borderRadius: BorderRadius.circular(10),

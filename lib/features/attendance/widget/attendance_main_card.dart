@@ -1,7 +1,6 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AttendanceMainCard extends StatelessWidget {
   final DateTime? date;
@@ -54,10 +53,12 @@ class AttendanceMainCard extends StatelessWidget {
                       children: [
                         const Icon(Icons.calendar_today, size: 18),
                         const SizedBox(width: 8),
-                        textPoppins(formatDate(date!),
-                            color: AppColors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)
+                        textPoppins(
+                          formatDate(date!),
+                          color: AppColors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ],
                     ),
                     GestureDetector(
@@ -67,7 +68,7 @@ class AttendanceMainCard extends StatelessWidget {
                         size: 24,
                         color: AppColors.black,
                       ),
-                    )
+                    ),
                   ],
                 )
               : Row(
@@ -76,26 +77,32 @@ class AttendanceMainCard extends StatelessWidget {
                       width: 25,
                       height: 25,
                       decoration: BoxDecoration(
-                        color: mainColor?.withValues(alpha: 0.8) ?? AppColors.grey,
+                        color:
+                            mainColor?.withValues(alpha: 0.8) ?? AppColors.grey,
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Center(
-                          child: textPoppins(rollNum ?? "0",
-                              color: AppColors.white,
-                              fontSize: 12,
-                              textAlign: TextAlign.center,
-                              fontWeight: FontWeight.w700)),
+                        child: textPoppins(
+                          rollNum ?? "0",
+                          color: AppColors.white,
+                          fontSize: 12,
+                          textAlign: TextAlign.center,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 16,),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         studentName ?? "-",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: AppColors.black,
-                            fontWeight: FontWeight.w700),
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          color: AppColors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
@@ -160,12 +167,7 @@ class _StatusItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(color: Colors.grey[600])),
       ],
     );
   }

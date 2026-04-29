@@ -174,17 +174,17 @@ class _ExportHistoryPageState extends ConsumerState<ExportHistoryPage> {
                                     color: AppColors.background,
                                     icon: const Icon(Icons.more_vert),
                                     itemBuilder: (context) => [
-                                      const PopupMenuItem(
+                                      PopupMenuItem(
                                         value: "open",
-                                        child: Text("Buka"),
+                                        child: textPoppins("Buka", color: AppColors.black, fontSize: 12, fontWeight: FontWeight.w400),
                                       ),
-                                      const PopupMenuItem(
+                                      PopupMenuItem(
                                         value: "share",
-                                        child: Text("Bagikan"),
+                                        child: textPoppins("Bagikan", color: AppColors.black, fontSize: 12, fontWeight: FontWeight.w400),
                                       ),
-                                      const PopupMenuItem(
+                                      PopupMenuItem(
                                         value: "delete",
-                                        child: Text("Hapus"),
+                                        child: textPoppins("Hapus", color: AppColors.black, fontSize: 12, fontWeight: FontWeight.w400),
                                       ),
                                     ],
 

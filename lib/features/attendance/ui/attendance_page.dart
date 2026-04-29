@@ -124,7 +124,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                           studentState.when(
                             data: (studentList) {
                               final totalStudents = studentList.length;
-        
+
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -167,15 +167,15 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                               ),
                             );
                           }
-        
+
                           if (!_initialized) {
                             _initialized = true;
-        
+
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               final notifier = ref.read(
                                 attendanceUIProvider.notifier,
                               );
-        
+
                               for (var student in studentList) {
                                 notifier.updateStatus(
                                   student.id,
@@ -184,18 +184,18 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                               }
                             });
                           }
-        
+
                           final sortedList = studentList.sortByRollNum();
-        
+
                           return ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: sortedList.length,
                             itemBuilder: (context, index) {
                               final student = sortedList[index];
-        
+
                               final status = attendanceUiState[student.id];
-        
+
                               return BoxAbsen(
                                 nama: student.name,
                                 no: student.rollNum.toString(),
@@ -225,11 +225,11 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
               studentState.when(
                 data: (studentList) {
                   final totalStudents = studentList.length;
-        
+
                   if (totalStudents == 0) {
                     return const SizedBox.shrink();
                   }
-        
+
                   return Positioned(
                     bottom: 24,
                     left: 0,
@@ -246,33 +246,37 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                         paddingVertical: 16,
                         onPressed: () async {
                           final uiState = ref.read(attendanceUIProvider);
-                          final notifier = ref.read(attendanceProvider.notifier);
+                          final notifier = ref.read(
+                            attendanceProvider.notifier,
+                          );
                           final detailNotifier = ref.read(
                             attendanceDetailProvider.notifier,
                           );
-        
+
                           final existingAttendance = await notifier
-                              .getAttendanceByDate(widget.schoolClassId, dateNow);
-        
+                              .getAttendanceByDate(
+                                widget.schoolClassId,
+                                dateNow,
+                              );
+
                           if (!context.mounted) return;
-        
+
                           if (existingAttendance != null) {
                             _isExistAttendance(
                               buildContext: context,
                               schClassId: widget.schoolClassId,
                               schClassName: widget.schoolClassName,
                               totalStudent: uiState.entries.length.toString(),
-                              attendanceId:
-                                  existingAttendance.id,
+                              attendanceId: existingAttendance.id,
                             );
                             return;
                           }
-        
+
                           final attendanceId = await notifier.createAttendance(
                             classId: widget.schoolClassId,
                             date: dateNow,
                           );
-        
+
                           for (final entry in uiState.entries) {
                             await detailNotifier.addDetail(
                               attendanceId: attendanceId,
@@ -280,12 +284,13 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                               status: entry.value,
                             );
                           }
-        
-                          ref.watch(attendanceUIProvider.notifier).reset();
+
+                          ref.read(attendanceUIProvider.notifier).reset();
                           ref.invalidate(summaryProvider);
-        
+                          ref.invalidate(attendanceProvider);
+
                           if (!context.mounted) return;
-        
+
                           Navigator.pushNamed(
                             context,
                             AppRoutes.attendanceResultPage,
@@ -360,7 +365,7 @@ void _isExistAttendance({
             borderRadius: BorderRadius.circular(10),
             onPressed: () {
               Navigator.pop(dialogContext);
-              
+
               Navigator.pushNamed(
                 buildContext,
                 AppRoutes.attendanceResultPage,
@@ -369,7 +374,7 @@ void _isExistAttendance({
                   "schoolClassName": schClassName,
                   "totalStudent": totalStudent,
                   "attendanceId": attendanceId,
-                  "date" : DateHelper.todayOnly(),
+                  "date": DateHelper.todayOnly(),
                 },
               );
             },

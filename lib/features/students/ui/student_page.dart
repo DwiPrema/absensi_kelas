@@ -9,7 +9,6 @@ import 'package:absensi_kelas/widgets/text_field_widget.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class StudentPage extends ConsumerStatefulWidget {
   final Color mainColor;
@@ -87,14 +86,18 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                       initialValue: selectedGender,
                       decoration: InputDecoration(
                         labelText: 'Gender',
-                        labelStyle: GoogleFonts.poppins(
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
                           color: AppColors.black.withAlpha(100),
                           fontSize: 14,
                           fontWeight: FontWeight.w300,
                         ),
                         border: const UnderlineInputBorder(),
                         enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey, width: 1.5),
+                          borderSide: BorderSide(
+                            color: Colors.grey,
+                            width: 1.5,
+                          ),
                         ),
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(

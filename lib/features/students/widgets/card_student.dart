@@ -1,7 +1,6 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CardStudent extends StatelessWidget {
   final String name;
@@ -75,7 +74,8 @@ class CardStudent extends StatelessWidget {
                       name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 14,
                         color: AppColors.black,
                         fontWeight: FontWeight.w800,
@@ -94,15 +94,17 @@ class CardStudent extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: "NIS / NISN : ",
-                            style: GoogleFonts.poppins(
-                              fontSize: 8,
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               color: AppColors.black,
                               fontWeight: FontWeight.w400,
+                              fontSize: 8,
                             ),
                           ),
                           TextSpan(
                             text: "$nis / $nisn",
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 8,
                               color: AppColors.black,
                               fontWeight: FontWeight.w700,

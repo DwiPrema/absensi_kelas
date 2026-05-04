@@ -226,7 +226,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   children: [
                     Center(
                       child: textPagratiNarrow(
-                        '${DateHelper.getMonthName(locale)} ',
+                        '${DateHelper.getMonthName(DateTime.now(), locale)} ',
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
                         color: AppColors.black,

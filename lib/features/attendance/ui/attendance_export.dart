@@ -13,6 +13,12 @@ class ExportHistoryPage extends ConsumerStatefulWidget {
 }
 
 class _ExportHistoryPageState extends ConsumerState<ExportHistoryPage> {
+  Future<void> _onRefresh() async {
+    ref.invalidate(attendanceExportProvider);
+
+    await Future.delayed(const Duration(milliseconds: 600));
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).toString();
@@ -23,205 +29,231 @@ class _ExportHistoryPageState extends ConsumerState<ExportHistoryPage> {
       backgroundColor: AppColors.grey,
       body: SafeArea(
         top: false,
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 120,
-              pinned: true,
-              backgroundColor: AppColors.blueCard,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              leading: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: Container(
-                      color: AppColors.black.withAlpha(40),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: AppColors.white,
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          color: AppColors.blueCard,
+          backgroundColor: AppColors.white,
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 120,
+                pinned: true,
+                backgroundColor: AppColors.blueCard,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+                leading: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Container(
+                        color: AppColors.black.withAlpha(40),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.all(12),
-                title: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      textPoppins(
-                        "Total File",
-                        color: AppColors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w300,
-                      ),
-                      files.when(
-                        data: (listFile) {
-                          return textPoppins(
-                            "${listFile.length} Export",
-                            color: AppColors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.w700,
-                          );
-                        },
-                        error: (e, s) => textPoppins("-"),
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                      ),
-                    ],
+                flexibleSpace: FlexibleSpaceBar(
+                  titlePadding: const EdgeInsets.all(12),
+                  title: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        textPoppins(
+                          "Total File",
+                          color: AppColors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w300,
+                        ),
+                        files.when(
+                          data: (listFile) {
+                            return textPoppins(
+                              "${listFile.length} Export",
+                              color: AppColors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w700,
+                            );
+                          },
+                          error: (e, s) => textPoppins("-"),
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                        ),
+                      ],
+                    ),
+                  ),
+                  background: Container(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top + 16,
+                    ),
+                    alignment: Alignment.topCenter,
+                    child: textPagratiNarrow(
+                      "Riwayat Export",
+                      color: AppColors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-                background: Container(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 16,
-                  ),
-                  alignment: Alignment.topCenter,
-                  child: textPagratiNarrow(
-                    "Riwayat Export",
-                    color: AppColors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
               ),
-            ),
 
-            files.when(
-              data: (fileList) {
-                return fileList.isEmpty
-                    ? SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Center(
-                            child: textPoppins(
-                              "Belum ada file export",
-                              color: AppColors.black,
+              files.when(
+                data: (fileList) {
+                  return fileList.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Center(
+                              child: textPoppins(
+                                "Belum ada file export",
+                                color: AppColors.black,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                    : SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final file = fileList[index];
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final file = fileList[index];
 
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(18),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withAlpha(10),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(18),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withAlpha(10),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.background,
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: const Icon(
+                                        Icons.table_chart,
+                                        color: AppColors.blueCard,
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 14),
+
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          textPoppins(
+                                            file.name,
+                                            color: AppColors.black,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
+                                          const SizedBox(height: 6),
+                                          textPoppins(
+                                            DateFormat(
+                                              "dd MMM yyyy • HH:mm",
+                                              locale,
+                                            ).format(file.modified),
+                                            color: Colors.grey,
+                                            fontSize: 11,
+                                          ),
+                                          textPoppins(
+                                            file.size,
+                                            color: Colors.grey,
+                                            fontSize: 11,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    PopupMenuButton(
                                       color: AppColors.background,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: const Icon(
-                                      Icons.table_chart,
-                                      color: AppColors.blueCard,
-                                    ),
-                                  ),
-
-                                  const SizedBox(width: 14),
-
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        textPoppins(
-                                          file.name,
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
+                                      icon: const Icon(Icons.more_vert),
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: "open",
+                                          child: textPoppins(
+                                            "Buka",
+                                            color: AppColors.black,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
-                                        const SizedBox(height: 6),
-                                        textPoppins(
-                                          DateFormat(
-                                            "dd MMM yyyy • HH:mm",
-                                            locale,
-                                          ).format(file.modified),
-                                          color: Colors.grey,
-                                          fontSize: 11,
+                                        PopupMenuItem(
+                                          value: "share",
+                                          child: textPoppins(
+                                            "Bagikan",
+                                            color: AppColors.black,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
-                                        textPoppins(
-                                          file.size,
-                                          color: Colors.grey,
-                                          fontSize: 11,
+                                        PopupMenuItem(
+                                          value: "delete",
+                                          child: textPoppins(
+                                            "Hapus",
+                                            color: AppColors.black,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ],
+
+                                      onSelected: (value) {
+                                        final notifier = ref.read(
+                                          attendanceExportProvider.notifier,
+                                        );
+
+                                        switch (value) {
+                                          case "open":
+                                            notifier.openFile(
+                                              file.file,
+                                              context,
+                                            );
+                                            break;
+                                          case "share":
+                                            notifier.shareFile(file.file);
+                                          case "delete":
+                                            notifier.deleteFile(file.file);
+                                            break;
+                                        }
+                                      },
                                     ),
-                                  ),
-
-                                  PopupMenuButton(
-                                    color: AppColors.background,
-                                    icon: const Icon(Icons.more_vert),
-                                    itemBuilder: (context) => [
-                                      PopupMenuItem(
-                                        value: "open",
-                                        child: textPoppins("Buka", color: AppColors.black, fontSize: 12, fontWeight: FontWeight.w400),
-                                      ),
-                                      PopupMenuItem(
-                                        value: "share",
-                                        child: textPoppins("Bagikan", color: AppColors.black, fontSize: 12, fontWeight: FontWeight.w400),
-                                      ),
-                                      PopupMenuItem(
-                                        value: "delete",
-                                        child: textPoppins("Hapus", color: AppColors.black, fontSize: 12, fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-
-                                    onSelected: (value) {
-                                      final notifier = ref.read(
-                                        attendanceExportProvider.notifier,
-                                      );
-
-                                      switch (value) {
-                                        case "open":
-                                          notifier.openFile(file.file, context);
-                                          break;
-                                        case "share":
-                                          notifier.shareFile(file.file);
-                                        case "delete":
-                                          notifier.deleteFile(file.file);
-                                          break;
-                                      }
-                                    },
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        }, childCount: fileList.length),
-                      );
-              },
-              error: (e, s) => SliverToBoxAdapter(
-                child: Center(child: textPoppins("Maaf, Terjadi Kesalahan")),
+                            );
+                          }, childCount: fileList.length),
+                        );
+                },
+                error: (e, s) => SliverToBoxAdapter(
+                  child: Center(child: textPoppins("Maaf, Terjadi Kesalahan")),
+                ),
+                loading: () => SliverToBoxAdapter(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
               ),
-              loading: () => SliverToBoxAdapter(
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
-          ],
+              const SliverToBoxAdapter(child: SizedBox(height: 20)),
+            ],
+          ),
         ),
       ),
     );

@@ -1,8 +1,8 @@
-# 📚 Classroom Attendance App
+# 📚 PresentApp
 
-A **Classroom Attendance** application built with **Flutter** and **Drift Database** to help record student attendance in a **fast, lightweight, and efficient** way.
+A modern **Classroom Attendance Application** built with **Flutter** and **Drift Database** to help manage student attendance in a **fast, lightweight, and efficient** way.
 
-This project is an **initial stable release**, focusing on implementing simple yet powerful core attendance features.
+PresentApp is designed to simplify attendance recording, monthly recap management, and attendance report exports for schools, teachers, and classroom administrators.
 
 ---
 
@@ -17,28 +17,56 @@ This project is an **initial stable release**, focusing on implementing simple y
 
 ## 🚀 Tech Stack
 
-| Technology | Description                     |
-| ---------- | ------------------------------- |
-| Flutter    | Cross-platform UI framework     |
-| Riverpod   | Modern state management         |
-| Drift       | Super fast local SQLite database |
-| Dart       | Main programming language       |
+| Technology | Description |
+|------------|-------------|
+| Flutter | Cross-platform UI framework |
+| Riverpod | Modern state management |
+| Drift | Local SQLite database |
+| Dart | Main programming language |
 
 ---
 
 ## 🎯 Main Features
 
-* ✅ Student attendance input per class
-* ✅ Daily attendance history
-* ✅ Monthly attendance recap per student
-* ✅ Sorting based on attendance number
-* ✅ Modern UI using Sliver
+### 📌 Attendance Management
+- ✅ Student attendance input per class
+- ✅ Daily attendance history
+- ✅ Delete attendance data
+- ✅ Pull to refresh attendance page
+
+### 📊 Recap & Reports
+- ✅ Monthly attendance recap per student
+- ✅ Export recap data to Excel
+- ✅ Export history shown in UI
+
+### 🎨 User Experience
+- ✅ Modern UI with SliverAppBar
+- ✅ Fast local database performance
+- ✅ Smooth state management using Riverpod
 
 ---
 
-## 📁 Project Structure (Simplified)
+## 🆕 What's New in v2.1.0
 
-```
+### ✨ Added
+- Delete attendance data feature
+- RefreshIndicator for faster data sync
+
+### 🐞 Fixed
+- Fixed monthly recap not updating instantly
+- Fixed minor UI issues
+- Fixed some data refresh bugs
+
+### ⚡ Improved
+- Better code structure
+- Performance optimization
+- Cleaner provider logic
+
+---
+
+## 📁 Project Structure
+
+```text
 lib/
 ├── core/
 │   ├── constant/
@@ -50,51 +78,10 @@ lib/
 │
 ├── features/
 │   ├── attendance/
+│   ├── export/
 │   ├── home/
 │   ├── school_classes/
 │   └── students/
 │
 ├── widgets/
 └── main.dart
-```
-
----
-
-## 🎯 Project Goals
-
-This project was created for:
-
-* 📚 School assignment & learning media for Flutter & Riverpod
-* 🧠 Implementation of a local database using Isar
-* 💼 Mobile app development portfolio
-* 🚀 Helping classroom devices / teachers in schools to record and recap student attendance
-
----
-
-## 📦 Download & Release
-
-This application has reached a stable stage for its core features. You can try the app directly by downloading the APK file on the **Releases** page.
-
-### **Latest Version: [v1.0.0 - Initial Release](https://www.google.com/search?q=https://github.com/DwiPrema/absensi_kelas/releases/tag/v1.0.0)**
-
-> **Note:** Choose the APK file that matches your device architecture (recommended **arm64-v8a** for modern smartphones).
-
----
-
-## 🚀 Future Improvements
-
-The development plan for the next version will focus on efficiency and smart technologies:
-
-* 📤 **Export Data:** Feature to export attendance reports to PDF or Excel format.
-
----
-
-## ⭐ Support
-
-If this project helps you, don’t forget to:
-
-* ⭐ **Star** this repository
-* 🍴 **Fork** the project for further development
-* 💬 Give feedback or suggestions through **Issues**
-
----

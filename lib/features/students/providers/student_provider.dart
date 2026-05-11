@@ -84,3 +84,4 @@ final studentByClass = FutureProvider.family<List<Student>, int>((
   final students = await service.getStudentsByClass(classId);
   return students;
 });
+

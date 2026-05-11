@@ -305,6 +305,41 @@ class _StudentPageState extends ConsumerState<StudentPage> {
     );
   }
 
+  void _showAddOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.person_add),
+                title: const Text("Tambah Manual"),
+                onTap: () {
+                  Navigator.pop(context);
+
+                  _showDialogData();
+                },
+              ),
+
+              ListTile(
+                leading: const Icon(Icons.document_scanner),
+                title: const Text("Import dari Foto"),
+                onTap: () {},
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final student = ref.watch(studentByClass(widget.schoolClass.id));
@@ -411,7 +446,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             borderRadius: BorderRadius.circular(5),
-                            onPressed: () => _showDialogData(),
+                            onPressed: () => _showAddOptions(),
                           ),
                         ],
                       ),

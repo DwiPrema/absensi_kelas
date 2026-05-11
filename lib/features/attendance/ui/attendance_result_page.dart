@@ -66,7 +66,10 @@ class ResultAttendancePage extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(100),
                     child: Container(
                       color: AppColors.black.withAlpha(50),
-                      child: const Icon(Icons.arrow_back, color: AppColors.white),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: AppColors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -102,7 +105,8 @@ class ResultAttendancePage extends ConsumerWidget {
                                 ],
                               ),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   textPoppins(
                                     "$day,",
@@ -133,7 +137,7 @@ class ResultAttendancePage extends ConsumerWidget {
                                 attendanceDetail.when(
                                   data: (studentList) {
                                     final totalStudent = studentList.length;
-        
+
                                     return BoxInfo(
                                       label: "Total",
                                       value: totalStudent.toString(),
@@ -163,7 +167,7 @@ class ResultAttendancePage extends ConsumerWidget {
                       final izin = data[StatusKehadiran.izin] ?? 0;
                       final sakit = data[StatusKehadiran.sakit] ?? 0;
                       final alpha = data[StatusKehadiran.alpha] ?? 0;
-        
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
@@ -213,25 +217,28 @@ class ResultAttendancePage extends ConsumerWidget {
             attendanceDetail.when(
               data: (attendances) {
                 final sortedAttendances = [...attendances];
-        
+
                 sortedAttendances.sort((a, b) {
                   final studentA = a['student'] as Student;
                   final studentB = b['student'] as Student;
-        
-                  return studentA.rollNum.compareTo(studentB.rollNum);
+
+                  final aNum = int.parse(studentA.rollNum.trim());
+                  final bNum = int.parse(studentB.rollNum.trim());
+
+                  return aNum.compareTo(bNum);
                 });
-        
+
                 return SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final item = sortedAttendances[index];
-        
+
                     final detail = item['attendanceDetail'] as AttendanceDetail;
                     final student = item['student'] as Student;
-        
+
                     final status = StatusKehadiranExtension.fromString(
                       detail.status,
                     );
-        
+
                     return BoxAbsen(
                       nama: student.name,
                       no: student.rollNum,
@@ -248,7 +255,10 @@ class ResultAttendancePage extends ConsumerWidget {
                 child: Center(child: CircularProgressIndicator()),
               ),
               error: (e, s) => SliverToBoxAdapter(
-                child: textPoppins("Data Absensi Error", color: AppColors.black),
+                child: textPoppins(
+                  "Data Absensi Error",
+                  color: AppColors.black,
+                ),
               ),
             ),
           ],

@@ -2,7 +2,6 @@ import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/widgets/button.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 
 class BoxAbsen extends StatelessWidget {
@@ -62,11 +61,11 @@ class BoxAbsen extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(
+                child: textPoppins(
                   nama,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.black,
                 ),
               ),
             ],
@@ -112,7 +111,7 @@ class BoxAbsen extends StatelessWidget {
                           Icons.keyboard_arrow_down_rounded,
                           size: 24,
                           color: AppColors.white,
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -128,10 +127,12 @@ class BoxAbsen extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.background,
-          title: textPoppins("Pilih Status Absen",
-              color: AppColors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w700),
+          title: textPoppins(
+            "Pilih Status Absen",
+            color: AppColors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: _statusOptions.map((statusOption) {
@@ -140,8 +141,11 @@ class BoxAbsen extends StatelessWidget {
                   backgroundColor: _getStatusColor(statusOption),
                   radius: 5,
                 ),
-                title: textPoppins(_getStatusLabel(statusOption),
-                    color: AppColors.black, fontSize: 14),
+                title: textPoppins(
+                  _getStatusLabel(statusOption),
+                  color: AppColors.black,
+                  fontSize: 14,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   onStatusChanged?.call(statusOption);
@@ -151,15 +155,16 @@ class BoxAbsen extends StatelessWidget {
           ),
           actions: [
             Button(
-                text: "batal",
-                textColor: AppColors.black,
-                bgColor: Colors.transparent,
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                borderRadius: BorderRadius.circular(10),
-                onPressed: () {
-                  Navigator.pop(context);
-                })
+              text: "batal",
+              textColor: AppColors.black,
+              bgColor: Colors.transparent,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ],
         );
       },

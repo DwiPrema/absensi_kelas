@@ -1,6 +1,5 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 Widget textPagratiNarrow(
   String text, {
@@ -12,7 +11,8 @@ Widget textPagratiNarrow(
   return Text(
     text,
     textAlign: textAlign,
-    style: GoogleFonts.pragatiNarrow(
+    style: TextStyle(
+      fontFamily: 'PragatiNarrow',
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
@@ -30,7 +30,8 @@ Widget textPoppins(
   return Text(
     text,
     textAlign: textAlign,
-    style: GoogleFonts.poppins(
+    style: TextStyle(
+      fontFamily: 'Poppins',
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,

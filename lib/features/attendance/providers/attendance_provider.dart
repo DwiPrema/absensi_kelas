@@ -69,11 +69,8 @@ class AttendanceNotifier extends AsyncNotifier<List<Attendance>> {
   }
 }
 
-final attendanceByClassAndMonthProvider =
-    FutureProvider.family<List<Attendance>, (int, DateTime)>((
-      ref,
-      param,
-    ) async {
+final attendanceByClassAndMonthProvider = FutureProvider.autoDispose
+    .family<List<Attendance>, (int, DateTime)>((ref, param) async {
       final service = ref.watch(attendanceServiceProvider);
       return service.getAttendanceByClassAndMonth(
         classId: param.$1,
@@ -82,24 +79,23 @@ final attendanceByClassAndMonthProvider =
     });
 
 final attendanceMonthlyRecapProvider =
-    FutureProvider.family<
-      Map<int, Map<StatusKehadiran, int>>,
-      (int, DateTime)
-    >((ref, param) async {
-      final service = ref.watch(attendanceServiceProvider);
-      final date = param.$2;
+    FutureProvider.family<Map<int, Map<StatusKehadiran, int>>, (int, DateTime)>(
+      (ref, param) async {
+        final service = ref.watch(attendanceServiceProvider);
+        final date = param.$2;
 
-      final data = await service.getAttendanceByClassAndMonth(
-        classId: param.$1,
-        date: date,
-      );
+        final data = await service.getAttendanceByClassAndMonth(
+          classId: param.$1,
+          date: date,
+        );
 
-      return service.getMonthlyRecap(
-        attendances: data,
-        month: date.month,
-        year: date.year,
-      );
-    });
+        return service.getMonthlyRecap(
+          attendances: data,
+          month: date.month,
+          year: date.year,
+        );
+      },
+    );
 
 final summaryProvider = FutureProvider.family((
   ref,

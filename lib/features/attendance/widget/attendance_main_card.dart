@@ -1,9 +1,12 @@
 import 'package:absensi_kelas/core/constant/app_colors.dart';
+import 'package:absensi_kelas/core/utils/date_helper.dart';
+import 'package:absensi_kelas/features/attendance/providers/attendance_provider.dart';
+import 'package:absensi_kelas/widgets/button.dart';
 import 'package:absensi_kelas/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AttendanceMainCard extends StatelessWidget {
+class AttendanceMainCard extends ConsumerWidget {
   final DateTime? date;
   final String? studentName;
   final String hadir;
@@ -13,6 +16,8 @@ class AttendanceMainCard extends StatelessWidget {
   final Color? mainColor;
   final String? rollNum;
   final VoidCallback? navigateToDetail;
+  final int? attendanceId;
+  final VoidCallback? onDeleteSuccess;
 
   const AttendanceMainCard({
     super.key,
@@ -20,15 +25,105 @@ class AttendanceMainCard extends StatelessWidget {
     required this.izin,
     required this.sakit,
     required this.alpha,
+    this.attendanceId,
     this.mainColor,
     this.studentName,
     this.rollNum,
     this.date,
     this.navigateToDetail,
+    this.onDeleteSuccess,
   });
 
+  void _deletePopup({required BuildContext context, required WidgetRef ref}) {
+    final locale = Localizations.localeOf(context).toString();
+    final dayName = DateHelper.getDayFullName(date!, locale);
+    final monthName = DateHelper.getMonthName(date!, locale);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: textPoppins(
+            "Yakin ingin hapus data absensi ini?",
+            color: AppColors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              textPoppins(
+                "Tanggal : $dayName, ${date!.day} $monthName ${date!.year}",
+                fontSize: 14,
+                color: AppColors.black,
+                fontWeight: FontWeight.w700
+              ),
+              const SizedBox(height: 16),
+              textPoppins(
+                "Jumlah Siswa Hadir : $hadir",
+                fontSize: 14,
+                color: AppColors.black,
+              ),
+              textPoppins(
+                "Jumlah Siswa Izin : $izin",
+                fontSize: 14,
+                color: AppColors.black,
+              ),
+              textPoppins(
+                "Jumlah Siswa Sakit : $sakit",
+                fontSize: 14,
+                color: AppColors.black,
+              ),
+              textPoppins(
+                "Jumlah Siswa Alpha: $alpha",
+                fontSize: 14,
+                color: AppColors.black,
+              ),
+            ],
+          ),
+          actions: [
+            Button(
+              text: "Batal",
+              textColor: AppColors.black,
+              bgColor: AppColors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            Button(
+              text: "Hapus",
+              textColor: AppColors.white,
+              bgColor: AppColors.redAlpha.withAlpha(230),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () async {
+                final notifier = ref.watch(attendanceProvider.notifier);
+
+                await notifier.deleteAttendance(attendanceId!);
+                onDeleteSuccess?.call();
+
+                if (!context.mounted) return;
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -54,20 +149,51 @@ class AttendanceMainCard extends StatelessWidget {
                       children: [
                         const Icon(Icons.calendar_today, size: 18),
                         const SizedBox(width: 8),
-                        textPoppins(formatDate(date!),
-                            color: AppColors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)
+                        textPoppins(
+                          formatDate(date!),
+                          color: AppColors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: navigateToDetail,
-                      child: const Icon(
-                        Icons.arrow_circle_right_outlined,
-                        size: 24,
-                        color: AppColors.black,
+                    SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: PopupMenuButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        color: AppColors.grey,
+                        splashRadius: 20,
+                        iconSize: 24,
+                        icon: const Icon(Icons.more_vert),
+                        onSelected: (value) {
+                          if (value == "delete") {
+                            _deletePopup(context: context, ref: ref);
+                          } else if (value == "detail") {
+                            navigateToDetail!();
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: "delete",
+                            child: textPoppins(
+                              "Hapus",
+                              color: AppColors.black,
+                              fontSize: 12,
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: "detail",
+                            child: textPoppins(
+                              "Detail",
+                              color: AppColors.black,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                    )
+                    ),
                   ],
                 )
               : Row(
@@ -76,26 +202,32 @@ class AttendanceMainCard extends StatelessWidget {
                       width: 25,
                       height: 25,
                       decoration: BoxDecoration(
-                        color: mainColor?.withValues(alpha: 0.8) ?? AppColors.grey,
+                        color:
+                            mainColor?.withValues(alpha: 0.8) ?? AppColors.grey,
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Center(
-                          child: textPoppins(rollNum ?? "0",
-                              color: AppColors.white,
-                              fontSize: 12,
-                              textAlign: TextAlign.center,
-                              fontWeight: FontWeight.w700)),
+                        child: textPoppins(
+                          rollNum ?? "0",
+                          color: AppColors.white,
+                          fontSize: 12,
+                          textAlign: TextAlign.center,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 16,),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         studentName ?? "-",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: AppColors.black,
-                            fontWeight: FontWeight.w700),
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          color: AppColors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
@@ -160,12 +292,7 @@ class _StatusItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(color: Colors.grey[600])),
       ],
     );
   }

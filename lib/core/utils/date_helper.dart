@@ -15,8 +15,12 @@ class DateHelper {
     return DateFormat('EEE', locale).format(date).toString();
   }
 
-  static String getMonthName(String locale) {
-    return DateFormat('MMMM', locale).format(DateTime.now());
+  static String getDayFullName(DateTime date, String locale) {
+    return DateFormat('EEEE', locale).format(date).toString();
+  }
+
+  static String getMonthName(DateTime date, String locale) {
+    return DateFormat('MMMM', locale).format(date);
   }
 
   static DayType getDayType(DateTime date) {

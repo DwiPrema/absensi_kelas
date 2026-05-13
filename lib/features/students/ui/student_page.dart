@@ -3,6 +3,7 @@ import 'package:absensi_kelas/core/database/app_database.dart';
 import 'package:absensi_kelas/core/enums/enum.dart';
 import 'package:absensi_kelas/core/extensions/student_extension.dart';
 import 'package:absensi_kelas/features/students/providers/student_provider.dart';
+import 'package:absensi_kelas/features/students/providers/student_scan_provider.dart';
 import 'package:absensi_kelas/features/students/widgets/card_student.dart';
 import 'package:absensi_kelas/widgets/button.dart';
 import 'package:absensi_kelas/widgets/text_field_widget.dart';
@@ -331,7 +332,11 @@ class _StudentPageState extends ConsumerState<StudentPage> {
               ListTile(
                 leading: const Icon(Icons.document_scanner),
                 title: const Text("Import dari Foto"),
-                onTap: () {},
+                onTap: () async {
+                  await ref
+                      .watch(studentScanProvider.notifier)
+                      .pickAndScanImage(widget.schoolClass.id);
+                },
               ),
             ],
           ),

@@ -13,7 +13,11 @@ dependencies:
   excel: ^4.0.6
   flutter:
     sdk: flutter
+  flutter_dotenv: ^6.0.1
   flutter_riverpod: ^2.6.1
+  google_generative_ai: ^0.4.7
+  google_mlkit_text_recognition: ^0.15.1
+  image_picker: ^1.2.2
   intl: ^0.20.2
   open_filex: ^4.7.0
   path: ^1.9.1
@@ -21,9 +25,9 @@ dependencies:
   share_plus: ^13.1.0
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.14.4
   build_runner: ^2.13.1
   drift_dev: ^2.32.1
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
@@ -31,6 +35,9 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+
+  assets:
+    - .env
 
   fonts:
     - family: Poppins
@@ -70,7 +77,7 @@ flutter:
         - asset: assets/fonts/pragati_narrow/PragatiNarrow-Bold.ttf
           weight: 700
 
-flutter_launcher_icons :
-  android : true
+flutter_launcher_icons:
+  android: true
   ios: true
   image_path: assets/app_icon/PresentApp.png

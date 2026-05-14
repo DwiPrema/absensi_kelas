@@ -8,6 +8,12 @@ class OcrService {
 
     final result = await textRecognizer.processImage(inputImage);
 
-    return result.text;
+    final cleanedText = result.text
+    .split('\n')
+    .map((e) => e.trim())
+    .where((e) => e.isNotEmpty)
+    .join('\n');
+
+    return cleanedText;
   }
 }

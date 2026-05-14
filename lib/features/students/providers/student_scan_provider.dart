@@ -21,28 +21,24 @@ class StudentScanNotifier extends AsyncNotifier<void> {
     _studentService = ref.read(studentServiceProvider);
   }
 
-  Future<void> pickAndScanImage(int classId) async {
+  Future<String?> pickImage() async {
+    final picker = ImagePicker();
+    final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+
+    return photo!.path;
+  }
+
+  Future<void> scanImage(int classId, String path) async {
     state = const AsyncLoading();
     try {
-      final picker = ImagePicker();
       final ocr = OcrService();
       final gemini = GeminiService();
 
-      final XFile? photo = await picker.pickImage(source: ImageSource.camera);
-
-      print("Start OCR");
-
-      final textOcr = await ocr.extractText(photo!.path);
-
-      print("Finish OCR");
+      final textOcr = await ocr.extractText(path);
 
       final parseText = await gemini.parseText(textOcr);
 
-      print("START GEMINI");
-
       final jsonFormat = jsonDecode(parseText);
-
-      print("GEMINI DONE");
 
       final students = (jsonFormat as List)
           .map((e) => StudentImportModel.fromJson(e))
@@ -54,7 +50,7 @@ class StudentScanNotifier extends AsyncNotifier<void> {
           rollNum: student.rollNum,
           gender: student.gender,
           nis: student.nis,
-          nisn: student.nis,
+          nisn: student.nisn,
           classId: classId,
         );
       }

@@ -307,6 +307,8 @@ class _StudentPageState extends ConsumerState<StudentPage> {
   }
 
   void _showAddOptions() {
+    final scanStudentNotifier = ref.read(studentScanProvider.notifier);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.background,
@@ -333,9 +335,22 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                 leading: const Icon(Icons.document_scanner),
                 title: const Text("Import dari Foto"),
                 onTap: () async {
-                  await ref
-                      .watch(studentScanProvider.notifier)
-                      .pickAndScanImage(widget.schoolClass.id);
+                  final path = await scanStudentNotifier.pickImage();
+
+                  if (path == null) return;
+
+                  if (!context.mounted) return;
+
+                  Navigator.pop(context);
+
+                  await scanStudentNotifier.scanImage(
+                    widget.schoolClass.id,
+                    path,
+                  );
+
+                  _showFinish();
+
+                  ref.invalidate(studentByClass(widget.schoolClass.id));
                 },
               ),
             ],
@@ -345,9 +360,55 @@ class _StudentPageState extends ConsumerState<StudentPage> {
     );
   }
 
+  void _showFinish() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.background,
+          title: textPoppins(
+            "Data Berhasil Di Input!",
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.black,
+          ),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 24),
+              textPoppins(
+                "Data Berhasil di Input!",
+                fontSize: 14,
+                color: AppColors.black,
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+          actions: [
+            Button(
+              text: "Batal",
+              textColor: AppColors.black,
+              bgColor: AppColors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final student = ref.watch(studentByClass(widget.schoolClass.id));
+
+    final studentScan = ref.watch(studentScanProvider);
 
     final paddingTopSafeArea = MediaQuery.of(context).padding.top;
 
@@ -400,7 +461,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                       Center(
                         child: textPagratiNarrow(
                           "Data Siswa",
-                          fontSize: 16,
+                          fontSize: 20,
                           fontWeight: FontWeight.w800,
                           textAlign: TextAlign.center,
                         ),
@@ -483,52 +544,71 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                 ),
               ),
             ),
-            student.when(
-              data: (studentList) {
-                if (studentList.isEmpty) {
-                  return SliverToBoxAdapter(
+            studentScan.when(
+              data: (data) {
+                return student.when(
+                  data: (studentList) {
+                    if (studentList.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: textPoppins(
+                              "Belum ada data siswa",
+                              color: AppColors.black,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    final sortedList = studentList.sortByRollNum();
+
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final student = sortedList[index];
+
+                        return CardStudent(
+                          name: student.name,
+                          rollNum: student.rollNum.toString(),
+                          gender: student.gender,
+                          mainColor: widget.mainColor,
+                          nis: student.nis,
+                          nisn: student.nisn,
+                          onTapRemove: () => _removeAlert(student),
+                          onTapEdit: () => _showDialogData(student: student),
+                        );
+                      }, childCount: sortedList.length),
+                    );
+                  },
+                  loading: () => SliverToBoxAdapter(
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: textPoppins(
-                          "Belum ada data siswa",
-                          color: AppColors.black,
-                          fontSize: 12,
+                        padding: EdgeInsets.all(20),
+                        child: CircularProgressIndicator(
+                          color: widget.mainColor,
                         ),
                       ),
                     ),
-                  );
-                }
-
-                final sortedList = studentList.sortByRollNum();
-
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final student = sortedList[index];
-
-                    return CardStudent(
-                      name: student.name,
-                      rollNum: student.rollNum.toString(),
-                      gender: student.gender,
-                      mainColor: widget.mainColor,
-                      nis: student.nis,
-                      nisn: student.nisn,
-                      onTapRemove: () => _removeAlert(student),
-                      onTapEdit: () => _showDialogData(student: student),
-                    );
-                  }, childCount: sortedList.length),
+                  ),
+                  error: (e, s) => SliverToBoxAdapter(
+                    child: Center(child: textPoppins("Terjadi kesalahan!")),
+                  ),
                 );
               },
-              loading: () => const SliverToBoxAdapter(
+              error: (e, s) => SliverToBoxAdapter(
                 child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: textPoppins("Maaf, Terjadi Kesalahan Saat Scan!"),
                 ),
               ),
-              error: (e, s) => SliverToBoxAdapter(
-                child: Center(child: textPoppins("Terjadi kesalahan!")),
+              loading: () => SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(color: widget.mainColor),
+                  ),
+                ),
               ),
             ),
           ],

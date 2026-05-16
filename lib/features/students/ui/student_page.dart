@@ -308,6 +308,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
 
   void _showAddOptions() {
     final scanStudentNotifier = ref.read(studentScanProvider.notifier);
+    final paddingBottom = MediaQuery.of(context).padding.bottom;
 
     showModalBottomSheet(
       context: context,
@@ -317,7 +318,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
       ),
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.fromLTRB(20, 20, 20, paddingBottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -332,10 +333,33 @@ class _StudentPageState extends ConsumerState<StudentPage> {
               ),
 
               ListTile(
-                leading: const Icon(Icons.document_scanner),
-                title: const Text("Import dari Foto"),
+                leading: const Icon(Icons.camera),
+                title: const Text("Foto data dengan kamera"),
                 onTap: () async {
-                  final path = await scanStudentNotifier.pickImage();
+                  final path = await scanStudentNotifier.pickImageFromCamera();
+
+                  if (path == null) return;
+
+                  if (!context.mounted) return;
+
+                  Navigator.pop(context);
+
+                  await scanStudentNotifier.scanImage(
+                    widget.schoolClass.id,
+                    path,
+                  );
+
+                  _showFinish();
+
+                  ref.invalidate(studentByClass(widget.schoolClass.id));
+                },
+              ),
+
+              ListTile(
+                leading: const Icon(Icons.document_scanner),
+                title: const Text("Pilih foto data dari galeri"),
+                onTap: () async {
+                  final path = await scanStudentNotifier.pickImageFromGalerry();
 
                   if (path == null) return;
 
@@ -361,46 +385,20 @@ class _StudentPageState extends ConsumerState<StudentPage> {
   }
 
   void _showFinish() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.background,
-          title: textPoppins(
-            "Data Berhasil Di Input!",
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppColors.black,
-          ),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 24),
-              textPoppins(
-                "Data Berhasil di Input!",
-                fontSize: 14,
-                color: AppColors.black,
-                textAlign: TextAlign.left,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-          actions: [
-            Button(
-              text: "Batal",
-              textColor: AppColors.black,
-              bgColor: AppColors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              borderRadius: BorderRadius.circular(10),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: textPoppins(
+          "Data berhasil diinput!",
+          color: AppColors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        backgroundColor: widget.mainColor,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(milliseconds: 3000),
+      ),
     );
   }
 
@@ -409,6 +407,8 @@ class _StudentPageState extends ConsumerState<StudentPage> {
     final student = ref.watch(studentByClass(widget.schoolClass.id));
 
     final studentScan = ref.watch(studentScanProvider);
+
+    final loadingText = ref.watch(scanLoadingTextProvider);
 
     final paddingTopSafeArea = MediaQuery.of(context).padding.top;
 
@@ -593,20 +593,37 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                     ),
                   ),
                   error: (e, s) => SliverToBoxAdapter(
-                    child: Center(child: textPoppins("Terjadi kesalahan!")),
+                    child: Center(
+                      child: textPoppins(
+                        "Terjadi kesalahan!",
+                        color: AppColors.black,
+                      ),
+                    ),
                   ),
                 );
               },
               error: (e, s) => SliverToBoxAdapter(
                 child: Center(
-                  child: textPoppins("Maaf, Terjadi Kesalahan Saat Scan!"),
+                  child: textPoppins(
+                    "Maaf, Terjadi Kesalahan Saat Scan!",
+                    color: AppColors.black,
+                  ),
                 ),
               ),
               loading: () => SliverToBoxAdapter(
                 child: Center(
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(color: widget.mainColor),
+                    child: Column(
+                      children: [
+                        textPoppins(
+                          loadingText,
+                          color: AppColors.black,
+                        ),
+                        SizedBox(height: 16),
+                        CircularProgressIndicator(color: widget.mainColor),
+                      ],
+                    ),
                   ),
                 ),
               ),

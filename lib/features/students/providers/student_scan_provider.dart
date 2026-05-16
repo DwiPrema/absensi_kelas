@@ -13,6 +13,10 @@ final studentScanProvider = AsyncNotifierProvider<StudentScanNotifier, void>(
   StudentScanNotifier.new,
 );
 
+final scanLoadingTextProvider = StateProvider<String>((ref) {
+    return "Memproses Data...";
+  });
+
 class StudentScanNotifier extends AsyncNotifier<void> {
   late final StudentService _studentService;
 
@@ -21,9 +25,16 @@ class StudentScanNotifier extends AsyncNotifier<void> {
     _studentService = ref.read(studentServiceProvider);
   }
 
-  Future<String?> pickImage() async {
+  Future<String?> pickImageFromCamera() async {
     final picker = ImagePicker();
     final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+
+    return photo!.path;
+  }
+
+  Future<String?> pickImageFromGalerry() async {
+    final picker = ImagePicker();
+    final XFile? photo = await picker.pickImage(source: ImageSource.gallery);
 
     return photo!.path;
   }
@@ -31,14 +42,20 @@ class StudentScanNotifier extends AsyncNotifier<void> {
   Future<void> scanImage(int classId, String path) async {
     state = const AsyncLoading();
     try {
+      ref.read(scanLoadingTextProvider.notifier).state = "Membaca Data...";
+
       final ocr = OcrService();
       final gemini = GeminiService();
 
       final textOcr = await ocr.extractText(path);
 
+      ref.read(scanLoadingTextProvider.notifier).state = "Memproses Data...";
+
       final parseText = await gemini.parseText(textOcr);
 
       final jsonFormat = jsonDecode(parseText);
+
+      ref.read(scanLoadingTextProvider.notifier).state = "Menginput Data...";
 
       final students = (jsonFormat as List)
           .map((e) => StudentImportModel.fromJson(e))

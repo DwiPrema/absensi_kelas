@@ -64,7 +64,7 @@ PresentApp is designed to simplify attendance recording, student management, mon
 
 ---
 
-## 🆕 What's New in v2.2.1
+## 🆕 What's New in v2.2.2
 
 ### ✨ Added
 

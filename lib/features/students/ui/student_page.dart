@@ -344,14 +344,18 @@ class _StudentPageState extends ConsumerState<StudentPage> {
 
                   Navigator.pop(context);
 
-                  await scanStudentNotifier.scanImage(
+                  final json = await scanStudentNotifier.scanImage(path);
+
+                  if (json == null) return;
+
+                  await scanStudentNotifier.inputData(
                     widget.schoolClass.id,
-                    path,
+                    json,
                   );
 
-                  _showFinish();
-
                   ref.invalidate(studentByClass(widget.schoolClass.id));
+
+                  _showFinish();
                 },
               ),
 
@@ -367,14 +371,18 @@ class _StudentPageState extends ConsumerState<StudentPage> {
 
                   Navigator.pop(context);
 
-                  await scanStudentNotifier.scanImage(
+                  final json = await scanStudentNotifier.scanImage(path);
+
+                  if (json == null) return;
+
+                  await scanStudentNotifier.inputData(
                     widget.schoolClass.id,
-                    path,
+                    json,
                   );
 
-                  _showFinish();
-
                   ref.invalidate(studentByClass(widget.schoolClass.id));
+
+                  _showFinish();
                 },
               ),
             ],
@@ -409,6 +417,8 @@ class _StudentPageState extends ConsumerState<StudentPage> {
     final studentScan = ref.watch(studentScanProvider);
 
     final loadingText = ref.watch(scanLoadingTextProvider);
+
+    final errorText = ref.watch(errorTextProvider);
 
     final paddingTopSafeArea = MediaQuery.of(context).padding.top;
 
@@ -604,9 +614,13 @@ class _StudentPageState extends ConsumerState<StudentPage> {
               },
               error: (e, s) => SliverToBoxAdapter(
                 child: Center(
-                  child: textPoppins(
-                    "Maaf, Terjadi Kesalahan Saat Scan!",
-                    color: AppColors.black,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: textPoppins(
+                      errorText,
+                      textAlign: TextAlign.center,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
               ),
@@ -616,10 +630,7 @@ class _StudentPageState extends ConsumerState<StudentPage> {
                     padding: EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        textPoppins(
-                          loadingText,
-                          color: AppColors.black,
-                        ),
+                        textPoppins(loadingText, color: AppColors.black),
                         SizedBox(height: 16),
                         CircularProgressIndicator(color: widget.mainColor),
                       ],
